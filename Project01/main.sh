@@ -9,7 +9,7 @@ while [[ true ]]; do
   if [[ $input -eq "1" ]]; then
     echo "execute 'megre_log.sh'"
     ./merge_log.sh
-    read "Would you like to use another feature?
+    read -p "Would you like to use another feature?
   1:Merge Log
   2:Exit" input
   elif [[ $input -eq "2" ]]; then
