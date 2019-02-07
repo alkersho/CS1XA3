@@ -16,6 +16,7 @@ while [[ true ]]; do
   0: Exit
 " input
   elif [[ $input -eq "2" ]]; then
+    echo "Executing 'todo_log.sh'"
     bash ./todo_log.sh
     read -p "Would you like to use another feature?
   1: Merge Log
