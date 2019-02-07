@@ -26,6 +26,8 @@ for hash in $git_log ; do
   esac
 
   if [[ -n $errors ]]; then
-    ""
+    echo "A working version has been found at $hash!"
+    git commit -m "reverted $file to latest working state from hash: $hash"
+    exit
   fi
 done
