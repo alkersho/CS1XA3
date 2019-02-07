@@ -1,6 +1,4 @@
 #!/bin/bash
-#python -m py_compile script.py
-#stack ghc --verbosity error script.hs
 cd ../
 read -p "Please enter the name of the file you want to fix.
 " file
