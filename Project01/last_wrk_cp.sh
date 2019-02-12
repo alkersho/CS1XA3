@@ -1,7 +1,11 @@
 #!/bin/bash
 cd ../
-read -p "Please enter the name of the file you want to fix.
-" file
+read -p "Please enter the name of the file you want to fix: " file
+
+while [[ !($file == "*.py" || $file == "*.hs") ]]; do
+  read -p "Please enter a valid file type, *.py or *.hs: " file
+done
+
 #check if there are any errors or no
 case $file in
   *.py )
