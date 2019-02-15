@@ -19,6 +19,6 @@ while [[ $((choice)) != $choice ]] || [[ ! $choice -lt $len ]]; do
 done
 
 cd "${repos[$choice]}"
-echo "git pull"
-echo "FUCKING DONE"
+git pull
+# echo "FUCKING DONE"
 rm "$0"
