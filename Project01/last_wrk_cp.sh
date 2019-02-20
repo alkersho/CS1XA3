@@ -19,6 +19,8 @@ if [[ -n $errors ]]; then
   exit
 fi
 
+
+
 #if file doesn't work at first
 git_log=$(git log --oneline | cut -d' ' -f1)
 for hash in $git_log ; do
@@ -33,6 +35,13 @@ for hash in $git_log ; do
   if [[ -n $errors ]]; then
     #if there are no errors commit older version and exit script
     echo "A working version has been found at $hash!"
+    pyc_files=$(find . -name *.pyc)
+    for file in $pyc_files; do
+      git_file_log=&(git ls-files "$file")
+      if [[ -n $git_file_log ]]; then
+        rm $file
+      fi
+    done
     git commit -m "reverted $file to latest working state from hash: $hash"
     exit
   fi
