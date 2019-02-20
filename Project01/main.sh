@@ -39,7 +39,7 @@ while [[ true ]]; do
   0: Exit
 " input
   elif [[ $input -eq "4" ]]; then
-    echo "Executing 'last_wrk_cp.sh'"
+    echo "Executing 'update_repo.sh'"
     bash ./update_repo.sh
     read -p "Would you like to use another feature?
   1: Merge Log
