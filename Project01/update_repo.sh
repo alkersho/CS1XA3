@@ -2,31 +2,46 @@
 
 #first time running script
 if [[ !(-f 'repo_data.enc') ]]; then
-  echo "Password for encrypted file(remember this as you will need it everytime you run this script):"
+  echo " Choose a password for encrypted file(remember this as you will need it everytime you run this script):"
   read -s file_p
-  read -p "Server address:" address
-  read -p "Login username:" usr_nm
-  if [[ !( -d "$HOME/.ssh" )]]; then
-    mkdir "$HOME/.ssh"
-  fi
-  echo $address > repo_data
-  echo $usr_nm >> repo_data
-  openssl aes-256-cbc -e -salt -in repo_data -out repo_data.enc -k "$file_p"
-  rm repo_data
-  ssh-keygen -b 2048 -t rsa -f "$HOME/.ssh/$address auto" -N "" -q
-  pub_key=$(cat "$HOME/.ssh/$address auto.pub")
-  ssh $usr_nm@$address -o PubkeyAuthentication=no "bash -s" < ./ur_add_key.sh $pub_key
+  touch repo_data
+  bash ./add_server.sh $file_p
 else
+  #server data file already exists and encrypted
   echo "Enter encrypted file password:"
   read -s file_p
-  cont=$(openssl aes-256-cbc -d -salt -in repo_data.enc -k "$file_p")
-  while [[ -z $cont ]]; do
-    echo "Wrong password, please try again."
-    read -s file_p
-    cont=$(openssl aes-256-cbc -d -salt -in repo_data.enc -k "$file_p")
-  done
-  address=$(echo $cont | cut -d' ' -f1)
-  usr_nm=$(echo $cont | cut -d' ' -f2)
 fi
-scp ur_remote.sh "$usr_nm@$address:/home/$usr_nm/ur_remote.sh"
-ssh "$usr_nm@$address" -o PubkeyAuthentication=yes "bash ./ur_remote.sh"
+
+cont=$(openssl aes-256-cbc -d -salt -in repo_data.enc -k "$file_p" | tr -d '[:space:]')
+while [[ -z $cont ]]; do
+  echo "Wrong password, please try again."
+  read -s file_p
+  cont=$(openssl aes-256-cbc -d -salt -in repo_data.enc -k "$file_p")
+done
+IFS=';' read -r -a servers <<< $cont
+len=${#servers[@]}
+echo "Please choose a server to connect to"
+echo "0: Add a new server"
+for (( i = 0; i < $len; i++ )); do
+  ((i+=1))
+  echo "$i: ${servers[i]}"
+done
+read choice
+while [[ $((choice)) != $choice ]] || [[ ! $choice -lt $len ]] || [[ $choice  == 0]]; do
+  if [[ $choice != 0 ]]; then
+    echo "Invalid choice"
+  fi
+  echo "Please choose a server to connect to."
+  echo "0: Add a new server"
+  for (( i = 0; i < $len; i++ )); do
+    j=$((i+1))
+    echo "$j: ${servers[i]}"
+  done
+  read choice
+  if [[ $choice == 0 ]]; then
+    bash ./add_server.sh $file_p
+  fi
+done
+
+scp -o PubkeyAuthentication=yes ur_remote.sh "${servers[$choice]}:/home/$usr_nm/ur_remote.sh"
+ssh "${servers[$choice]}" -o PubkeyAuthentication=yes "bash ./ur_remote.sh"
