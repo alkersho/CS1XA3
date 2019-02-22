@@ -24,6 +24,8 @@ Would you like to use another feature?
   4: Update Remote Repo
   0: Exit
 ```
+### Design Decisions
+I decided to keep each function is its own seperate .sh file for abstraction and keeping different function from interfering with one another and to make it easier for development purposes.
 
 ## Merge Log
 #### Input
@@ -47,7 +49,9 @@ File name (python or Haskell file)
 #### Output
 None
 #### Description
+Tries to compile the given file using the appropriate compiler, python3 for .py and stack ghc for .hs files. If the compiler failed, ie produced an error, then it will retrieve all the available commits on this branch and try each version of the file in chronological order, latest first, untill it finds a working version of the file.
 
+If it doesn't find a working version it will go back to very latest version, even if it is not working.
 
 ## Custom Feature (Update git repo on remote server)
 #### Input
