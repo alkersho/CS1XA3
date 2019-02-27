@@ -10,9 +10,9 @@ done
 #check if there are any compiler errors at current version
 case $file in
   *.py )
-    errors=$(python3 -m py_compile "$file");;
+    errors=$((python3 -m py_compile "$file") 2> &1);;
   *.hs )
-    errors=$(stack ghc --verbosity error "$file");;
+    errors=$((stack ghc --verbosity error "$file") 2> &1);;
 esac
 
 #if the file compiles successfuly then say so and quit
@@ -37,9 +37,9 @@ for hash in $git_log ; do
   git checkout $hash -- $file
   case $file in
     *.py )
-      errors=$(python3 -m py_compile "$file");;
+      errors=$((python3 -m py_compile "$file") 2> &1);;
     *.hs )
-      errors=$(stack ghc --verbosity error "$file");;
+      errors=$((stack ghc --verbosity error "$file") 2> &1);;
   esac
 
   if [[ -n $errors ]]; then
