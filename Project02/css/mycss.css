@@ -1,0 +1,29 @@
+.Primary {
+    background-color:#ff5722;
+    color: black
+}
+
+.Primary-light {
+    background-color: #ff8a50;
+    color: white
+}
+
+.Primary-dark {
+    background-color:#c41c00;
+    color:black
+}
+
+.Secondary {
+    background-color:#ff6d00;
+    color:black;
+}
+
+.Secondary-light {
+    background-color:#ff9e40;
+    color: black;
+}
+
+.Secondary-dark {
+    background-color:#c43c00;
+    color: white;
+}
