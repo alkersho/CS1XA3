@@ -1,6 +1,10 @@
 .Primary {
     background-color:#ff5722;
     color: black;
+    text-align: center;
+    padding:50px 0;
+    box-shadow: 0px 10px 20px #bfbfbf;
+    margin-bottom: 15px
 }
 
 .Primary-link {
@@ -42,23 +46,20 @@
 }
 
 .main_body{
-    /* margin: 30px 10px 50px 35px; */
-    padding: 30px 5px 10px 30px;
-    border-right-width: 1px;
-    border-right-style: solid;
-
+    padding: 30px 30px 0px 30px;
 }
 
 .contacts{
-    padding: 30px 10px 10px 30px;
+    padding: 30px 10px 30px 30px;
+    box-shadow: 0px -5px 20px 0px #bfbfbf;
+    border-radius: 15px;
+    height: fit-content;
 }
 
 .header-holder{
     margin-bottom: 20px;
     margin-left: 0px;
-    padding-bottom: 15px;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+    /* border-bottom-width: 2px; */
 }
 
 .profile-img {
@@ -66,4 +67,31 @@
     box-shadow: 0 0 20px 0 #bfbfbf;
     width: inherit;
     max-width: 300px;
+}
+
+.my-card{
+    border-radius: 5px;
+    /* border-width: thin;
+    border-style: solid; */
+    padding: 0px;
+    box-shadow: 0 0 10px 0 #bfbfbf;
+    overflow: hidden;
+}
+
+.my-card-head{
+    padding: 5px;
+    transition: background-color 250ms linear;
+}
+
+.my-card-head:hover{
+    background: lightgrey;
+    /* transition: background-color 250ms ease-in-out; */
+}
+
+.my-card-body{
+    padding: 5px;
+}
+
+.info{
+    margin: 20px 10px 20px 10px;
 }
