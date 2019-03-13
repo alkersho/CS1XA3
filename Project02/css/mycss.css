@@ -1,16 +1,24 @@
 .Primary {
     background-color:#ff5722;
-    color: black
+    color: black;
 }
 
-.Primary-light {
-    background-color: #ff8a50;
-    color: white
+.Primary-link {
+    background-color:#ff5722;
+    color: black;
 }
+
+.Primary-link:hover {
+    background-color: #ff8a50;
+    color: black;
+    -webkit-transition: background-color 100ms linear;
+    -ms-transition: background-color 100ms linear;
+    transition: background-color 100ms linear;
+} 
 
 .Primary-dark {
     background-color:#c41c00;
-    color:black
+    color:white
 }
 
 .Secondary {
@@ -18,12 +26,44 @@
     color:black;
 }
 
-.Secondary-light {
-    background-color:#ff9e40;
+.Secondary-link {
+    background-color:#ff6d00;
     color: black;
+}
+
+.Secondary-link:hover {
+    background-color: #ff9e40;
+    color: black
 }
 
 .Secondary-dark {
     background-color:#c43c00;
     color: white;
+}
+
+.main_body{
+    /* margin: 30px 10px 50px 35px; */
+    padding: 30px 5px 10px 30px;
+    border-right-width: 1px;
+    border-right-style: solid;
+
+}
+
+.contacts{
+    padding: 30px 10px 10px 30px;
+}
+
+.header-holder{
+    margin-bottom: 20px;
+    margin-left: 0px;
+    padding-bottom: 15px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+.profile-img {
+    border-radius: 15px;
+    box-shadow: 0 0 20px 0 #bfbfbf;
+    width: inherit;
+    max-width: 300px;
 }
