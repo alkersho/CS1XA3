@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lab 7</title>
+</head>
+
+<body>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td><label for="usrnm">Username:</label></td>
+                <td><input type="text" name="usrnm" id="usrnm"></td>
+            </tr>
+            <tr>
+                <td><label for="pass">Password:</label></td>
+                <td><input type="password" name="pass" id="pass"></td>
+            </tr>
+            <tr>
+                <td><label for="passagain">Password Again:</label></td>
+                <td><input type="password" name="passagain" id="passagain"></td>
+            </tr>
+            <tr>
+                <td colspan="2"><button type="submit">Submit</button></td>
+            </tr>
+        </table>
+    </form>
+    {% if result%}
+    <div>{{ result }}</div>
+    {% endif %}
+</body>
+
+</html>
