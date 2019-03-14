@@ -80,17 +80,15 @@
 
 .my-card-head{
     padding: 5px;
-    transition: background-color 250ms linear;
+    transition: background-color 150ms linear;
+    cursor: pointer;
 }
 
-.my-card-head:hover{
+.my-card-head:active{
     background: lightgrey;
     /* transition: background-color 250ms ease-in-out; */
 }
 
-.my-card-body{
-    padding: 5px;
-}
 
 .info{
     margin: 20px 10px 20px 10px;
