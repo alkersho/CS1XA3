@@ -1,3 +1,4 @@
 *.log
 **/Testing
 **/.vscode
+**/__pycache__
