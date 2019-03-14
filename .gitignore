@@ -1,5 +1,4 @@
 *.log
 **/Testing
-**/assets
 **/django*
 **/.vscode
