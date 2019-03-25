@@ -104,6 +104,7 @@ type Msg = Name String
          | ChaDn
          | GetClass (Result Http.Error ClassAttr)
          | GetRace (Result Http.Error RaceAttr)
+         | GetBackground (Result Http.Error BackgroundAttr)
          | CreateButton
 
 --init
@@ -119,11 +120,20 @@ update msg model =
         Name string ->
             ({model | name = string}, Cmd.none )
         ClassStr string ->
-          ({model | classStr = string}, (Http.get { url = "data.json", expect = Http.expectJson GetClass (decodeClass string)}))
+          if string == "" then
+            (model, Cmd.none)
+          else
+            ({model | classStr = string}, (Http.get { url = "data.json", expect = Http.expectJson GetClass (decodeClass string)}))
         RaceStr string ->
-          ({model | raceStr = string}, (Http.get { url = "data.json", expect = Http.expectJson GetRace (decodeRace string) }))
+          if string == "" then
+            (model, Cmd.none)
+          else
+            ({model | raceStr = string}, (Http.get { url = "data.json", expect = Http.expectJson GetRace (decodeRace string) }))
         Background string ->
-          (model, Cmd.none)
+          if string == "" then
+            (model, Cmd.none)
+          else
+            ({model | background = string}, (Http.get { url = "data.json", expect = (Http.expectJson GetBackground (decodeBackground string)) }))
         Alignment string ->
           ({model | alignment = string}, Cmd.none)
         StrUp ->
@@ -222,6 +232,12 @@ update msg model =
               ({model | raceAttr = val}, Cmd.none)
             Err error ->
               (errorHandler model error, Cmd.none)
+        GetBackground result ->
+          case result of
+            Ok val ->
+              ({model | backgroundAttr=val}, Cmd.none)
+            Err error ->
+              (errorHandler model error, Cmd.none)
         CreateButton ->
           (model, Cmd.none)
 
@@ -256,6 +272,14 @@ decodeRace string =
         (at ["races", string, "wisdom"] Decode.int)
         (at ["races", string, "charisma"] Decode.int)
 
+decodeBackground : String -> Decode.Decoder BackgroundAttr
+decodeBackground string =
+    Decode.map5 BackgroundAttr
+        (at ["backgrounds", string, "languages"] Decode.string)
+        (at ["backgrounds", string, "money"] Decode.int)
+        (at ["backgrounds", string, "skills"] (Decode.list Decode.string))
+        (at ["backgrounds", string, "feature"] Decode.string)
+        (at ["backgrounds", string, "equipment"] Decode.string)
 
 
 errorHandler : Model -> Http.Error -> Model
@@ -297,6 +321,13 @@ view model =
           td [] [select [name "race", onInput RaceStr] [
             option [value "", selected True] [text ""],
             option [value "Dwarf"] [text "Dwarf"]
+            ]]
+          ],
+        tr [] [
+          td [] [label [for "bg"] [text "Background:"]],
+          td [] [select [name "bg", onInput Background][
+            option [value "", selected True] [text ""],
+            option [value "Acolyte"] [text "Acolyte"]
             ]]
           ]
         ],
