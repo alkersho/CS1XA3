@@ -74,15 +74,16 @@ nullRaceAttr =
     { bigness = "", speed = 0, strength = 0, dextrerity = 0, constitution = 0, intelligence = 0, wisdom = 0, charisma = 0 }
 
 type alias BackgroundAttr = {
-  languages : List String,
-  tools : List String,
+  languages : String,
   money : Int,
-  skills : List String
+  skills : List String,
+  feature: String,
+  equipment: String
   }
 
 nullBackgroundAttr : BackgroundAttr
 nullBackgroundAttr =
-    { languages = [], tools = [], money = 0, skills = [] }
+    { languages = "", money = 0, skills = [], feature = "", equipment = "" }
 --msgs
 type Msg = Name String
          | ClassStr String
