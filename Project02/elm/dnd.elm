@@ -110,7 +110,23 @@ type Msg = Name String
 --init
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( { name = "", classStr = "", raceStr = "", background = "", alignment = "", classAttr = nullClassAttr, raceAttr = nullRaceAttr, backgroundAttr = nullBackgroundAttr, strength = 0, dextrerity = 0, constitution = 0, intelligence = 0, wisdom = 0, charisma = 0, skillPts = 0, error = "", created = False}, Cmd.none)
+    ( { name = "",
+    classStr = "",
+    raceStr = "",
+    background = "",
+    alignment = "",
+    classAttr = nullClassAttr,
+    raceAttr = nullRaceAttr,
+    backgroundAttr = nullBackgroundAttr,
+    strength = 8,
+    dextrerity =  8,
+    constitution =  8,
+    intelligence =  8,
+    wisdom =  8,
+    charisma =  8,
+    skillPts =  27,
+    error = "",
+    created = False}, Cmd.none)
 
 
 --update
@@ -146,7 +162,7 @@ update msg model =
         StrDn ->
           if model.strength == 8 then
             (model, Cmd.none)
-          else if model.strength < 14 then
+          else if model.strength < 15 then
             ({model | strength = model.strength - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | strength = model.strength - 1, skillPts = model.skillPts + 2}, Cmd.none)
@@ -174,7 +190,7 @@ update msg model =
         ConDn ->
           if model.constitution == 8 then
             (model, Cmd.none)
-          else if model.constitution < 14 then
+          else if model.constitution < 15 then
             ({model | constitution = model.constitution - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | constitution = model.constitution - 1, skillPts = model.skillPts + 2}, Cmd.none)
@@ -188,7 +204,7 @@ update msg model =
         IntDn ->
           if model.intelligence == 8 then
             (model, Cmd.none)
-          else if model.intelligence < 14 then
+          else if model.intelligence < 15 then
             ({model | intelligence = model.intelligence - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | intelligence = model.intelligence - 1, skillPts = model.skillPts + 2}, Cmd.none)
@@ -202,7 +218,7 @@ update msg model =
         WisDn ->
           if model.wisdom == 8 then
             (model, Cmd.none)
-          else if model.wisdom < 14 then
+          else if model.wisdom < 15 then
             ({model | wisdom = model.wisdom - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | wisdom = model.wisdom - 1, skillPts = model.skillPts + 2}, Cmd.none)
@@ -216,7 +232,7 @@ update msg model =
         ChaDn ->
           if model.charisma == 8 then
             (model, Cmd.none)
-          else if model.charisma < 14 then
+          else if model.charisma < 15 then
             ({model | charisma= model.charisma - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | charisma = model.charisma - 1, skillPts = model.skillPts + 2}, Cmd.none)
@@ -329,6 +345,14 @@ view model =
             option [value "", selected True] [text ""],
             option [value "Acolyte"] [text "Acolyte"]
             ]]
+          ],
+        tr [] [
+          td [] [label [] [text "Str:"]],
+          td [] [button [onClick StrUp] [text "+"], text (String.fromInt model.strength), button [onClick StrDn] [text "-"]]
+          ],
+        tr [] [
+          td [] [text "Points remaining:"],
+          td [] [text (String.fromInt model.skillPts)]
           ]
         ],
       table [] [
