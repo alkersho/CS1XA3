@@ -1,0 +1,37 @@
+{
+  "classes": {
+    "Barbarian": {
+      "proBunus": 2,
+      "hp": 12,
+      "hpMode": "con",
+      "proArmor": ["Light Armor", "Medium Armor", "Shields"],
+      "proWeapon": ["Simple Weapons", "Martial Weapons"],
+      "proTools": [],
+      "savingThrows": ["str", "con"],
+      "skills": ["Intimidation", "Survival"],
+      "weapons": ["Martial Melee Weapon", "Simple Weapon"],
+      "starterEq": ["An explorer’s pack and four javelins"],
+      "cantrips": [],
+      "spells": [],
+      "dice": "1d12",
+      "features": ["Unarmored Defense", "Reckless Attack", "Danger Sense"]
+    }
+  },
+  "races": {
+    "Dwarf": {
+      "size": "Medium",
+      "speed": 25,
+      "features": "Darkvision, Dwarven Resilience, Dwarven Combat Training(You have proficiency with the battleaxe, handaxe, light hammer, and warhammer.), Tool Proficiency(You gain proficiency with the artisan’s tools of your choice: smith’s tools, brewer’s supplies, or mason’s tools.), Stonecunning(Whenever you make an Intelligence check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus.)",
+      "languages": "Common Dwarvish",
+      "strength": 0,
+      "dextrerity": 0,
+      "constitution": 2,
+      "intelligence": 0,
+      "charisma": 0,
+      "wisdom": 0
+    }
+  },
+  "backgrounds": {
+    "Test": 123
+  }
+}
