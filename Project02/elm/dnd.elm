@@ -8,6 +8,7 @@ import Json.Decode as Decode exposing (at)
 import Json.Decode.Pipeline exposing (custom)
 import Browser
 
+-- main : Program flags  model msg
 main =
   Browser.element {
     init = init,
@@ -34,8 +35,42 @@ type alias Model = {
     charisma : Int,
     skillPts : Int,
     error : String,
-    created : Bool
+    created : Bool,
+    skills : Skills
   }
+
+type alias Skills = {
+  --str
+  athletics : Int,
+
+  --dex
+  acrobats : Int,
+  slieghtOfHand : Int,
+  stealth : Int,
+
+  --int
+  arcana : Int,
+  history : Int,
+  investigation : Int,
+  nature : Int,
+  religion : Int,
+
+  --wis
+  animalHandling : Int,
+  insight : Int,
+  medicine : Int,
+  perception : Int,
+  survival : Int,
+
+  --cha
+  deception : Int,
+  intimidation : Int,
+  performance : Int,
+  persuasion : Int
+  }
+nullSkills : Skills
+nullSkills =
+    { athletics = 0, acrobats = 0, slieghtOfHand = 0, stealth = 0, arcana = 0, history = 0, investigation = 0, nature = 0, religion = 0, animalHandling = 0, insight = 0, medicine = 0, perception = 0, survival = 0, deception = 0, intimidation = 0, performance = 0, persuasion = 0 }
 
 --Attr types
 type alias ClassAttr = {
@@ -126,7 +161,8 @@ init _ =
     charisma =  8,
     skillPts =  27,
     error = "",
-    created = False}, Cmd.none)
+    created = False,
+    skills = nullSkills}, Cmd.none)
 
 
 --update
@@ -255,7 +291,11 @@ update msg model =
             Err error ->
               (errorHandler model error, Cmd.none)
         CreateButton ->
-          (model, Cmd.none)
+          if model.classStr /= "" && model.raceStr /= "" && model.background /= "" then
+            ({model | skills = (calcSkill model)}, Cmd.none)
+          else
+            ({model | error = "Please choose class, race and bg first"}, Cmd.none)
+
 
 --decoders
 decodeClass : String -> Decode.Decoder ClassAttr
@@ -348,7 +388,7 @@ view model =
           ],
         tr [] [
           td [] [label [] [text "Str:"]],
-          td [] [button [onClick StrUp] [text "+"], text (String.fromInt model.strength), button [onClick StrDn] [text "-"]]
+          td [] [button [onClick StrUp] [text "+"], text (String.fromInt model.strength), button [onClick StrDn] [text "-"],text <| String.fromInt <| (model.strength-10) //2 ]
           ],
         tr [] [
           td [] [text "Points remaining:"],
@@ -375,9 +415,156 @@ view model =
           tr [] [
             td [] [text "Speed:"],
             td [] [text (String.fromInt model.raceAttr.speed)]
+            ],
+          tr [] [
+            td [] [button [onClick CreateButton] [text "Test Create"]]
             ]
           ],
-
+          --
+          table [] [
+            tr [] [
+              td [] [text "Athletics"],
+              td [] [text <| String.fromInt model.skills.athletics]
+              ],
+            tr [] [
+              td [] [text "Acrobats"],
+              td [] [text <| String.fromInt model.skills.acrobats]
+              ],
+            tr [] [
+              td [] [text "Slieght Of Hand"],
+              td [] [text <| String.fromInt model.skills.slieghtOfHand]
+              ],
+            tr [] [
+              td [] [text "Stealth"],
+              td [] [text <| String.fromInt model.skills.stealth]
+              ],
+            tr [] [
+              td [] [text "Arcana"],
+              td [] [text <| String.fromInt model.skills.arcana]
+              ],
+            tr [] [
+              td [] [text "History"],
+              td [] [text <| String.fromInt model.skills.history]
+              ],
+            tr [] [
+              td [] [text "Investigation"],
+              td [] [text <| String.fromInt model.skills.investigation]
+              ],
+            tr [] [
+              td [] [text "Nature "],
+              td [] [text <| String.fromInt model.skills.nature]
+              ],
+            tr [] [
+              td [] [text "Religion"],
+              td [] [text <| String.fromInt model.skills.religion]
+              ],
+            tr [] [
+              td [] [text "Animal Handling"],
+              td [] [text <| String.fromInt model.skills.animalHandling]
+              ],
+            tr [] [
+              td [] [text "Insight"],
+              td [] [text <| String.fromInt model.skills.insight]
+              ],
+            tr [] [
+              td [] [text "Medicine"],
+              td [] [text <| String.fromInt model.skills.medicine]
+              ],
+            tr [] [
+              td [] [text "Perception"],
+              td [] [text <| String.fromInt model.skills.perception]
+              ],
+            tr [] [
+              td [] [text "Survival"],
+              td [] [text <| String.fromInt model.skills.survival]
+              ],
+            tr [] [
+              td [] [text "Deception"],
+              td [] [text <| String.fromInt model.skills.deception]
+              ],
+            tr [] [
+              td [] [text "Intimidation"],
+              td [] [text <| String.fromInt model.skills.intimidation]
+              ],
+            tr [] [
+              td [] [text "Performance"],
+              td [] [text <| String.fromInt model.skills.performance]
+              ],
+            tr [] [
+              td [] [text "Persuasion"],
+              td [] [text <| String.fromInt model.skills.persuasion]
+              ]
+          ],
           text model.error
 
     ]
+
+
+addSkillFromStringList : Skills -> List String -> Int -> Skills
+addSkillFromStringList sk s i =
+  case s of
+    "Athletics"::ss ->
+      addSkillFromStringList {sk | athletics = sk.athletics + i} ss i
+    "Acrobats"::ss ->
+      addSkillFromStringList {sk | acrobats = sk.acrobats + i} ss i
+    "Slieght Of Hand"::ss ->
+      addSkillFromStringList {sk | slieghtOfHand = sk.slieghtOfHand + i} ss i
+    "Stealth"::ss ->
+      addSkillFromStringList {sk | stealth = sk.stealth + i} ss i
+    "Arcana"::ss ->
+      addSkillFromStringList {sk | arcana = sk.arcana + i} ss i
+    "History"::ss ->
+      addSkillFromStringList {sk | history = sk.history + i} ss i
+    "Investigation"::ss ->
+      addSkillFromStringList {sk | investigation = sk.investigation + i} ss i
+    "Nature"::ss ->
+      addSkillFromStringList {sk | nature = sk.nature + i} ss i
+    "Religion"::ss ->
+      addSkillFromStringList {sk | religion = sk.religion + i} ss i
+    "Animal Handling"::ss ->
+      addSkillFromStringList {sk | animalHandling = sk.animalHandling + i} ss i
+    "Insight"::ss ->
+      addSkillFromStringList {sk | insight = sk.insight + i} ss i
+    "Medicine"::ss ->
+      addSkillFromStringList {sk | medicine = sk.medicine + i} ss i
+    "Perception"::ss ->
+      addSkillFromStringList {sk | perception = sk.perception + i} ss i
+    "Survival"::ss ->
+      addSkillFromStringList {sk | survival = sk.survival + i} ss i
+    "Deception"::ss ->
+      addSkillFromStringList {sk | deception = sk.deception + i} ss i
+    "Intimidation"::ss ->
+      addSkillFromStringList {sk | intimidation = sk.intimidation + i} ss i
+    "Performance"::ss ->
+      addSkillFromStringList {sk | performance = sk.performance + i} ss i
+    "Persuasion"::ss ->
+      addSkillFromStringList {sk | persuasion = sk.persuasion + i} ss i
+    [] ->
+      sk
+    _::ss ->
+      addSkillFromStringList sk ss i
+
+calcSkill : Model -> Skills
+calcSkill model =
+  let
+    sk = { athletics = (model.strength - 10) // 2,
+      acrobats = (model.dextrerity - 10) // 2,
+      slieghtOfHand = (model.dextrerity - 10) // 2,
+      stealth = (model.dextrerity - 10) // 2,
+      arcana = (model.intelligence - 10) // 2,
+      history = (model.intelligence - 10) // 2,
+      investigation = (model.intelligence - 10) // 2,
+      nature = (model.intelligence - 10) // 2,
+      religion = (model.intelligence - 10) // 2,
+      animalHandling = (model.wisdom - 10) // 2,
+      insight = (model.wisdom - 10) // 2,
+      medicine = (model.wisdom - 10) // 2,
+      perception = (model.wisdom - 10) // 2,
+      survival = (model.wisdom - 10) // 2,
+      deception = (model.charisma - 10) // 2,
+      intimidation = (model.charisma - 10) // 2,
+      performance = (model.charisma - 10) // 2,
+      persuasion = (model.charisma - 10) // 2 }
+    skillsClass = model.classAttr.skills
+    skillsBG = model.backgroundAttr.skills
+  in addSkillFromStringList (addSkillFromStringList sk skillsClass model.classAttr.proBunus) skillsBG model.classAttr.proBunus
