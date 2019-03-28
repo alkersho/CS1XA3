@@ -37,7 +37,9 @@ type alias Model = {
     skillPts : Int,
     error : String,
     created : Bool,
-    skills : Skills
+    skills : Skills,
+    weaponSelection : List String,
+    armorSelection : List String
   }
 
 type alias Skills = {
@@ -88,12 +90,12 @@ type alias ClassAttr = {
     cantrips : List String,
     spells : List String,
     dice : String,
-    feautes: List String
+    feautes: List String,
+    imgUrl: String
   }
 nullClassAttr : ClassAttr
 nullClassAttr =
-    { proBunus = 0, hp = 0, hpMode = "", proArmour = [], proWeapon = [], proTools = [], savingThrows = [], skills = [], weapons = [], starterEq = [], cantrips = [], spells = [], dice = "", feautes = [] }
-
+    { proBunus = 0, hp = 0, hpMode = "", proArmour = [], proWeapon = [], proTools = [], savingThrows = [], skills = [], weapons = [], starterEq = [], cantrips = [], spells = [], dice = "", feautes = [], imgUrl = "" }
 
 type alias RaceAttr = {
     bigness : String,
@@ -103,11 +105,12 @@ type alias RaceAttr = {
     constitution : Int,
     intelligence : Int,
     wisdom : Int,
-    charisma : Int
+    charisma : Int,
+    imgUrl : String
   }
 nullRaceAttr : RaceAttr
 nullRaceAttr =
-    { bigness = "", speed = 0, strength = 0, dextrerity = 0, constitution = 0, intelligence = 0, wisdom = 0, charisma = 0 }
+    { bigness = "", speed = 0, strength = 0, dextrerity = 0, constitution = 0, intelligence = 0, wisdom = 0, charisma = 0, imgUrl = "" }
 
 type alias BackgroundAttr = {
   languages : String,
@@ -126,6 +129,8 @@ type Msg = Name String
          | RaceStr String
          | Background String
          | Alignment String
+         | WeaponString String
+         | ArmorString String
          | StrUp
          | StrDn
          | DexUp
@@ -141,12 +146,15 @@ type Msg = Name String
          | GetClass (Result Http.Error ClassAttr)
          | GetRace (Result Http.Error RaceAttr)
          | GetBackground (Result Http.Error BackgroundAttr)
+         | GetWeapons (Result Http.Error (List String))
+         | GetArmor (Result Http.Error (List String))
+         | NextStep
          | CreateButton
 
 --init
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( { stage = 0,
+    ( { stage = 1,
     name = "",
     classStr = "",
     raceStr = "",
@@ -164,7 +172,9 @@ init _ =
     skillPts =  27,
     error = "",
     created = False,
-    skills = nullSkills}, Cmd.none)
+    skills = nullSkills,
+    weaponSelection = [],
+    armorSelection = []}, Cmd.none)
 
 
 --update
@@ -190,6 +200,10 @@ update msg model =
             ({model | background = string}, (Http.get { url = "data.json", expect = (Http.expectJson GetBackground (decodeBackground string)) }))
         Alignment string ->
           ({model | alignment = string}, Cmd.none)
+        WeaponString str ->
+          (model, (Http.get { url = "data.json", expect = Http.expectJson GetWeapons (getWeaponNames str) }))
+        ArmorString str ->
+          (model, (Http.get { url = "data.json", expect = Http.expectJson GetArmor (getArmorNames str) }))
         StrDn ->
           if model.strength == 8 then
             (model, Cmd.none)
@@ -328,11 +342,36 @@ update msg model =
               ({model | backgroundAttr=val}, Cmd.none)
             Err error ->
               (errorHandler model error, Cmd.none)
+        GetWeapons result ->
+          case result of
+            Ok val ->
+              ({model | weaponSelection = val}, Cmd.none)
+            Err val ->
+              ((errorHandler model val), Cmd.none)
+        GetArmor result ->
+          case result of
+            Ok val ->
+              ({model | armorSelection = val}, Cmd.none)
+            Err val ->
+              ((errorHandler model val), Cmd.none)
         CreateButton ->
           if model.classStr /= "" && model.raceStr /= "" && model.background /= "" then
             ({model | skills = (calcSkill model)}, Cmd.none)
           else
             ({model | error = "Please choose class, race and bg first"}, Cmd.none)
+        NextStep ->
+          if model.stage == 0 then
+              if model.classAttr /= nullClassAttr && model.raceAttr /= nullRaceAttr && model.backgroundAttr /= nullBackgroundAttr then
+                ({model | stage = 1, skills = (calcSkill model)}, Cmd.batch [
+                (Http.get { url = "data.json", expect = Http.expectJson GetWeapons (getWeaponNames "simple melee") }),
+                (Http.get { url = "data.json", expect = Http.expectJson GetArmor (getArmorNames "light") })])
+              else
+                ({model | error = "Please choose a Class, Race and Background."}, Cmd.none)
+          else if model.stage == 1 then
+              ({model | error = "Didn't code the next stage yet"}, Cmd.none)
+          else
+              ({model | error = "WTF HAPPENED!!! " ++ String.fromInt model.stage}, Cmd.none)
+
 
 
 --decoders
@@ -353,18 +392,20 @@ decodeClass str =
     |> custom (at ["classes", str, "spells"] (Decode.list Decode.string))
     |> custom (at ["classes", str, "dice"] Decode.string)
     |> custom (at ["classes", str, "features"] (Decode.list Decode.string))
+    |> custom (at ["classes", str, "img-url"] Decode.string)
 
 decodeRace : String -> Decode.Decoder RaceAttr
 decodeRace string =
-    Decode.map8 RaceAttr
-        (at ["races", string, "size"] Decode.string)
-        (at ["races", string, "speed"] Decode.int)
-        (at ["races", string, "strength"] Decode.int)
-        (at ["races", string, "dextrerity"] Decode.int)
-        (at ["races", string, "constitution"] Decode.int)
-        (at ["races", string, "intelligence"] Decode.int)
-        (at ["races", string, "wisdom"] Decode.int)
-        (at ["races", string, "charisma"] Decode.int)
+    Decode.succeed RaceAttr
+        |> custom (at ["races", string, "size"] Decode.string)
+        |> custom (at ["races", string, "speed"] Decode.int)
+        |> custom (at ["races", string, "strength"] Decode.int)
+        |> custom (at ["races", string, "dextrerity"] Decode.int)
+        |> custom (at ["races", string, "constitution"] Decode.int)
+        |> custom (at ["races", string, "intelligence"] Decode.int)
+        |> custom (at ["races", string, "wisdom"] Decode.int)
+        |> custom (at ["races", string, "charisma"] Decode.int)
+        |> custom (at ["races", string, "img-url"] Decode.string)
 
 decodeBackground : String -> Decode.Decoder BackgroundAttr
 decodeBackground string =
@@ -543,13 +584,16 @@ view model =
     case model.stage of
         0 ->
             chrView model
+        1 ->
+          eqView model
         _ ->
-          text "Out of Bounds"
+          text "Out of bounds"
 
 chrView : Model -> Html Msg
 chrView model =
   div [] [
-    div
+    node "link" [rel "stylesheet", href "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"] []
+    ,div
       [ class "container" ]
       [ div
         [ class "container-fluid" ]
@@ -576,7 +620,10 @@ chrView model =
         [ class "row" ]
         [ div
           [ class "col-md-4" ]
-          [ select
+
+          [
+            text "Class:"
+            , select
             [ name "class", onInput ClassStr ]
             [ option
               [ value "", selected True ]
@@ -588,13 +635,14 @@ chrView model =
           ]
         , div
           [ class "col-md-8" ]
-          [ text "Class img here" ]
+          [ img [src model.classAttr.imgUrl, style "max-height" "250px"] [] ]
         ]
       , div
         [ class "row" ]
         [ div
           [ class "col-md-4" ]
-          [ select
+          [ text "Race:"
+            , select
             [ name "race", onInput RaceStr]
             [ option
               [ value "", selected True ]
@@ -606,10 +654,26 @@ chrView model =
           ]
         , div
           [ class "col-md-8" ]
-          [ text "Race img here" ]
+          [ img [src model.raceAttr.imgUrl, style "max-height" "250px"] [] ]
+        ]
+      , div
+        [class "row"]
+        [ div
+          [class "col-md-4"]
+          [ text "Background:"
+          , select
+          [ name "bg", onInput Background ]
+          [ option
+            [ value "", selected True ]
+            []
+          , option
+            [ value "Acolyte" ]
+            [ text "Acolyte" ]
+          ]
+          ]
         ]
       , table
-        []
+        [style "width" "75%", style "margin-right" "auto", style "margin-left" "auto"]
         [ tr
           []
           [ td
@@ -670,8 +734,64 @@ chrView model =
           ]
         ],
         text <| "Remaining Skill Points: " ++ String.fromInt model.skillPts
+      , button [onClick NextStep] [text "Next ->"]
+      , text model.error
       ]
   ]
+
+eqView : Model -> Html Msg
+eqView model =
+    div [] [
+      node "link" [rel "stylesheet", href "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"] []
+      , div [class "container"] [
+        table [][
+          tr [] [
+          td [] [text "Weapon:"],
+          td [] [select [onInput WeaponString] [
+            option [value "simple melee"] [text "Simple Melee"],
+            option [value "simple ranged"] [text "Simple Ranged"],
+            option [value "martial melee"] [text "Martial Melee"],
+            option [value "martial ranged"] [text "Martial Ranged"]
+          ]],
+          td [] [select [] (weaponsOptions model.weaponSelection)]
+        ]
+        ],
+        table [][
+          tr [] [
+          td [] [text "Armor:"],
+          td [] [select [onInput ArmorString] [
+            option [value "light"] [text "Light"],
+            option [value "medium"] [text "Medium"],
+            option [value "heavy"] [text "Heavy"]
+          ]],
+          td [] [select [] (armorOptions model.armorSelection)]
+        ]
+        ],
+        text model.error
+      ]
+    ]
+
+weaponsOptions : (List String) -> List (Html Msg)
+weaponsOptions xs =
+  let
+      weaponsOptionsAux n ys =
+        case ys of
+          y::zs ->
+            option [value (String.fromInt n)] [text y]:: weaponsOptionsAux (n+1) zs
+          [] ->
+            []
+  in weaponsOptionsAux 0 xs
+
+armorOptions : (List String) -> List (Html Msg)
+armorOptions xs =
+  let
+      weaponsOptionsAux n ys =
+        case ys of
+          y::zs ->
+            option [value (String.fromInt n)] [text y]:: weaponsOptionsAux (n+1) zs
+          [] ->
+            []
+  in weaponsOptionsAux 0 xs
 
 
 addSkillFromStringList : Skills -> List String -> Int -> Skills
@@ -742,3 +862,19 @@ calcSkill model =
     skillsClass = model.classAttr.skills
     skillsBG = model.backgroundAttr.skills
   in addSkillFromStringList (addSkillFromStringList sk skillsClass model.classAttr.proBunus) skillsBG model.classAttr.proBunus
+
+getWeaponNames : String -> Decode.Decoder (List String)
+getWeaponNames str =
+  at ["Weapons", str] <| Decode.list weaponNamesDecoder
+
+weaponNamesDecoder : Decode.Decoder String
+weaponNamesDecoder =
+  Decode.field "name" Decode.string
+
+getArmorNames : String -> Decode.Decoder (List String)
+getArmorNames string =
+    at ["armours", string] <| Decode.list armorNamesDecoder
+
+armorNamesDecoder : Decode.Decoder String
+armorNamesDecoder =
+    Decode.field "name" Decode.string
