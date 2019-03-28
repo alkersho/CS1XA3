@@ -251,7 +251,7 @@
         "cost": 1500,
         "weight": 65,
         "mod": "",
-        "modMax":
+        "modMax": 0
       }
     ]
   },
