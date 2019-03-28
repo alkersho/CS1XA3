@@ -14,7 +14,8 @@
       "cantrips": [],
       "spells": [],
       "dice": "1d12",
-      "features": ["Unarmored Defense", "Reckless Attack", "Danger Sense"]
+      "features": ["Unarmored Defense", "Reckless Attack", "Danger Sense"],
+      "img-url": "https://media-waterdeep.cursecdn.com/avatars/thumbnails/6/342/420/618/636272680339895080.png"
     }
   },
   "races": {
@@ -28,7 +29,8 @@
       "constitution": 2,
       "intelligence": 0,
       "charisma": 0,
-      "wisdom": 0
+      "wisdom": 0,
+      "img-url": "https://media-waterdeep.cursecdn.com/avatars/thumbnails/6/254/420/618/636271781394265550.png"
     }
   },
   "backgrounds": {
