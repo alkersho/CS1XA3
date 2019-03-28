@@ -8,7 +8,7 @@ import Json.Decode as Decode exposing (at)
 import Json.Decode.Pipeline exposing (custom)
 import Browser
 
--- main : Program flags  model msg
+main : Program () Model Msg
 main =
   Browser.element {
     init = init,
@@ -19,6 +19,7 @@ main =
 
 --Model
 type alias Model = {
+    stage : Int,
     name : String,
     classStr : String,
     raceStr : String,
@@ -145,7 +146,8 @@ type Msg = Name String
 --init
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( { name = "",
+    ( { stage = 0,
+    name = "",
     classStr = "",
     raceStr = "",
     background = "",
@@ -188,13 +190,6 @@ update msg model =
             ({model | background = string}, (Http.get { url = "data.json", expect = (Http.expectJson GetBackground (decodeBackground string)) }))
         Alignment string ->
           ({model | alignment = string}, Cmd.none)
-        StrUp ->
-          if model.strength < 14 then
-            ({model | strength = model.strength + 1, skillPts =  model.skillPts - 1}, Cmd.none)
-          else if model.strength == 15 then
-              (model, Cmd.none)
-          else
-            ({model | strength = model.strength + 1, skillPts = model.skillPts - 2}, Cmd.none)
         StrDn ->
           if model.strength == 8 then
             (model, Cmd.none)
@@ -202,27 +197,39 @@ update msg model =
             ({model | strength = model.strength - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | strength = model.strength - 1, skillPts = model.skillPts + 2}, Cmd.none)
-        DexUp ->
-          if model.dextrerity < 14 then
-            ({model | dextrerity = model.dextrerity + 1, skillPts = model.skillPts - 1}, Cmd.none)
-          else if model.dextrerity == 15 then
+        StrUp ->
+          if model.strength < 14 then
+            if model.skillPts - 1 >= 0 then
+              ({model | strength = model.strength + 1, skillPts =  model.skillPts - 1}, Cmd.none)
+            else
+              (model, Cmd.none)
+          else if model.strength == 15 then
               (model, Cmd.none)
           else
-            ({model | dextrerity = model.dextrerity + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            if model.skillPts - 2 >= 0 then
+                ({model | strength = model.strength + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            else
+                (model, Cmd.none)
         DexDn ->
           if model.dextrerity == 8 then
             (model, Cmd.none)
-          else if model.dextrerity < 14 then
+          else if model.dextrerity < 15 then
             ({model | dextrerity = model.dextrerity - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | dextrerity = model.dextrerity - 1, skillPts = model.skillPts + 2}, Cmd.none)
-        ConUp ->
-          if model.constitution < 14 then
-            ({model | constitution = model.constitution + 1, skillPts = model.skillPts - 1}, Cmd.none)
-          else if model.constitution == 15 then
+        DexUp ->
+          if model.dextrerity < 14 then
+            if model.skillPts - 1 >= 0 then
+              ({model | dextrerity = model.dextrerity + 1, skillPts =  model.skillPts - 1}, Cmd.none)
+            else
+              (model, Cmd.none)
+          else if model.dextrerity == 15 then
               (model, Cmd.none)
           else
-            ({model | constitution = model.constitution + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            if model.skillPts - 2 >= 0 then
+                ({model | dextrerity = model.dextrerity + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            else
+                (model, Cmd.none)
         ConDn ->
           if model.constitution == 8 then
             (model, Cmd.none)
@@ -230,13 +237,19 @@ update msg model =
             ({model | constitution = model.constitution - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | constitution = model.constitution - 1, skillPts = model.skillPts + 2}, Cmd.none)
-        IntUp ->
-          if model.intelligence < 14 then
-            ({model | intelligence = model.intelligence + 1, skillPts = model.skillPts - 1}, Cmd.none)
-          else if model.intelligence == 15 then
+        ConUp ->
+          if model.constitution < 14 then
+            if model.skillPts - 1 >= 0 then
+              ({model | constitution = model.constitution + 1, skillPts =  model.skillPts - 1}, Cmd.none)
+            else
+              (model, Cmd.none)
+          else if model.constitution == 15 then
               (model, Cmd.none)
           else
-            ({model | intelligence = model.intelligence + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            if model.skillPts - 2 >= 0 then
+                ({model | constitution = model.constitution + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            else
+                (model, Cmd.none)
         IntDn ->
           if model.intelligence == 8 then
             (model, Cmd.none)
@@ -244,13 +257,19 @@ update msg model =
             ({model | intelligence = model.intelligence - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | intelligence = model.intelligence - 1, skillPts = model.skillPts + 2}, Cmd.none)
-        WisUp ->
-          if model.wisdom < 14 then
-            ({model | wisdom = model.wisdom + 1, skillPts = model.skillPts - 1}, Cmd.none)
-          else if model.wisdom == 15 then
+        IntUp ->
+          if model.intelligence < 14 then
+            if model.skillPts - 1 >= 0 then
+              ({model | intelligence = model.intelligence + 1, skillPts =  model.skillPts - 1}, Cmd.none)
+            else
+              (model, Cmd.none)
+          else if model.intelligence == 15 then
               (model, Cmd.none)
           else
-            ({model | wisdom = model.wisdom + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            if model.skillPts - 2 >= 0 then
+                ({model | intelligence = model.intelligence + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            else
+                (model, Cmd.none)
         WisDn ->
           if model.wisdom == 8 then
             (model, Cmd.none)
@@ -258,13 +277,19 @@ update msg model =
             ({model | wisdom = model.wisdom - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | wisdom = model.wisdom - 1, skillPts = model.skillPts + 2}, Cmd.none)
-        ChaUp ->
-          if model.charisma < 14 then
-            ({model | charisma = model.charisma + 1, skillPts = model.skillPts - 1}, Cmd.none)
-          else if model.charisma == 15 then
+        WisUp ->
+          if model.wisdom < 14 then
+            if model.skillPts - 1 >= 0 then
+              ({model | wisdom = model.wisdom + 1, skillPts =  model.skillPts - 1}, Cmd.none)
+            else
+              (model, Cmd.none)
+          else if model.wisdom == 15 then
               (model, Cmd.none)
           else
-            ({model | charisma = model.charisma + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            if model.skillPts - 2 >= 0 then
+                ({model | wisdom = model.wisdom + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            else
+                (model, Cmd.none)
         ChaDn ->
           if model.charisma == 8 then
             (model, Cmd.none)
@@ -272,6 +297,19 @@ update msg model =
             ({model | charisma= model.charisma - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | charisma = model.charisma - 1, skillPts = model.skillPts + 2}, Cmd.none)
+        ChaUp ->
+          if model.charisma < 14 then
+            if model.skillPts - 1 >= 0 then
+              ({model | charisma = model.charisma + 1, skillPts =  model.skillPts - 1}, Cmd.none)
+            else
+              (model, Cmd.none)
+          else if model.charisma == 15 then
+              (model, Cmd.none)
+          else
+            if model.skillPts - 2 >= 0 then
+                ({model | charisma = model.charisma + 1, skillPts = model.skillPts - 2}, Cmd.none)
+            else
+                (model, Cmd.none)
         GetClass result ->
           case result of
             Ok val ->
@@ -357,147 +395,283 @@ errorHandler model error =
             { model | error = "bad body " ++ body }
 
 --view
+--temp layout
+-- view : Model -> Html Msg
+-- view model =
+--     div [] [
+--       table [] [
+--         tr [] [
+--           td [] [ label [for "name"] [text "Name"]],
+--           td [] [input [type_ "text", placeholder "Name", value model.name, onInput Name] []]
+--           ],
+--         tr [] [
+--           td [] [ label [for "class"] [text "Class:"]],
+--           td [] [select [name "class", onInput ClassStr][
+--             option [value "Barbarian"] [text "Barbarian"],
+--             option [value "", selected True] [text ""]
+--             ]]
+--           ],
+--         tr [] [
+--           td [] [label [for "race"] [text "Race:"]],
+--           td [] [select [name "race", onInput RaceStr] [
+--             option [value "", selected True] [text ""],
+--             option [value "Dwarf"] [text "Dwarf"]
+--             ]]
+--           ],
+--         tr [] [
+--           td [] [label [for "bg"] [text "Background:"]],
+--           td [] [select [name "bg", onInput Background][
+--             option [value "", selected True] [text ""],
+--             option [value "Acolyte"] [text "Acolyte"]
+--             ]]
+--           ],
+--         tr [] [
+--           td [] [label [] [text "Str:"]],
+--           td [] [button [onClick StrUp] [text "+"], text (String.fromInt model.strength), button [onClick StrDn] [text "-"],text <| String.fromInt <| (model.strength-10) //2 ]
+--           ],
+--         tr [] [
+--           td [] [text "Points remaining:"],
+--           td [] [text (String.fromInt model.skillPts)]
+--           ]
+--         ],
+--       table [] [
+--           tr [] [
+--             td [] [text "Name"],
+--             td [] [text model.name]
+--           ],
+--           tr [] [
+--             td [] [text "Class"],
+--             td [] [text model.classStr]
+--             ],
+--           tr [] [
+--             td [] [text "HP"],
+--             td [] [text (String.fromInt model.classAttr.hp)]
+--             ],
+--           tr [] [
+--             td [] [text "Race:"],
+--             td [] [text model.raceStr]
+--             ],
+--           tr [] [
+--             td [] [text "Speed:"],
+--             td [] [text (String.fromInt model.raceAttr.speed)]
+--             ],
+--           tr [] [
+--             td [] [button [onClick CreateButton] [text "Test Create"]]
+--             ]
+--           ],
+--           --
+--           table [] [
+--             tr [] [
+--               td [] [text "Athletics"],
+--               td [] [text <| String.fromInt model.skills.athletics]
+--               ],
+--             tr [] [
+--               td [] [text "Acrobats"],
+--               td [] [text <| String.fromInt model.skills.acrobats]
+--               ],
+--             tr [] [
+--               td [] [text "Slieght Of Hand"],
+--               td [] [text <| String.fromInt model.skills.slieghtOfHand]
+--               ],
+--             tr [] [
+--               td [] [text "Stealth"],
+--               td [] [text <| String.fromInt model.skills.stealth]
+--               ],
+--             tr [] [
+--               td [] [text "Arcana"],
+--               td [] [text <| String.fromInt model.skills.arcana]
+--               ],
+--             tr [] [
+--               td [] [text "History"],
+--               td [] [text <| String.fromInt model.skills.history]
+--               ],
+--             tr [] [
+--               td [] [text "Investigation"],
+--               td [] [text <| String.fromInt model.skills.investigation]
+--               ],
+--             tr [] [
+--               td [] [text "Nature "],
+--               td [] [text <| String.fromInt model.skills.nature]
+--               ],
+--             tr [] [
+--               td [] [text "Religion"],
+--               td [] [text <| String.fromInt model.skills.religion]
+--               ],
+--             tr [] [
+--               td [] [text "Animal Handling"],
+--               td [] [text <| String.fromInt model.skills.animalHandling]
+--               ],
+--             tr [] [
+--               td [] [text "Insight"],
+--               td [] [text <| String.fromInt model.skills.insight]
+--               ],
+--             tr [] [
+--               td [] [text "Medicine"],
+--               td [] [text <| String.fromInt model.skills.medicine]
+--               ],
+--             tr [] [
+--               td [] [text "Perception"],
+--               td [] [text <| String.fromInt model.skills.perception]
+--               ],
+--             tr [] [
+--               td [] [text "Survival"],
+--               td [] [text <| String.fromInt model.skills.survival]
+--               ],
+--             tr [] [
+--               td [] [text "Deception"],
+--               td [] [text <| String.fromInt model.skills.deception]
+--               ],
+--             tr [] [
+--               td [] [text "Intimidation"],
+--               td [] [text <| String.fromInt model.skills.intimidation]
+--               ],
+--             tr [] [
+--               td [] [text "Performance"],
+--               td [] [text <| String.fromInt model.skills.performance]
+--               ],
+--             tr [] [
+--               td [] [text "Persuasion"],
+--               td [] [text <| String.fromInt model.skills.persuasion]
+--               ]
+--           ],
+--           text model.error
+--
+--     ]
+
 view : Model -> Html Msg
 view model =
-    div [] [
-      table [] [
-        tr [] [
-          td [] [ label [for "name"] [text "Name"]],
-          td [] [input [type_ "text", placeholder "Name", value model.name, onInput Name] []]
-          ],
-        tr [] [
-          td [] [ label [for "class"] [text "Class:"]],
-          td [] [select [name "class", onInput ClassStr][
-            option [value "Barbarian"] [text "Barbarian"],
-            option [value "", selected True] [text ""]
-            ]]
-          ],
-        tr [] [
-          td [] [label [for "race"] [text "Race:"]],
-          td [] [select [name "race", onInput RaceStr] [
-            option [value "", selected True] [text ""],
-            option [value "Dwarf"] [text "Dwarf"]
-            ]]
-          ],
-        tr [] [
-          td [] [label [for "bg"] [text "Background:"]],
-          td [] [select [name "bg", onInput Background][
-            option [value "", selected True] [text ""],
-            option [value "Acolyte"] [text "Acolyte"]
-            ]]
-          ],
-        tr [] [
-          td [] [label [] [text "Str:"]],
-          td [] [button [onClick StrUp] [text "+"], text (String.fromInt model.strength), button [onClick StrDn] [text "-"],text <| String.fromInt <| (model.strength-10) //2 ]
-          ],
-        tr [] [
-          td [] [text "Points remaining:"],
-          td [] [text (String.fromInt model.skillPts)]
+    case model.stage of
+        0 ->
+            chrView model
+        _ ->
+          text "Out of Bounds"
+
+chrView : Model -> Html Msg
+chrView model =
+  div [] [
+    div
+      [ class "container" ]
+      [ div
+        [ class "container-fluid" ]
+        [ table
+          []
+          [ tr
+            []
+            [ td
+              []
+              [ label
+                [ for "name" ]
+                [ text "Name:" ]
+              ]
+            , td
+              []
+              [ input
+                [ type_ "text", placeholder "Name", onInput Name ]
+                []
+              ]
+            ]
+          ]
+        ]
+      , div
+        [ class "row" ]
+        [ div
+          [ class "col-md-4" ]
+          [ select
+            [ name "class", onInput ClassStr ]
+            [ option
+              [ value "", selected True ]
+              []
+            , option
+              [ value "Barbarian" ]
+              [ text "Barbarian" ]
+            ]
+          ]
+        , div
+          [ class "col-md-8" ]
+          [ text "Class img here" ]
+        ]
+      , div
+        [ class "row" ]
+        [ div
+          [ class "col-md-4" ]
+          [ select
+            [ name "race", onInput RaceStr]
+            [ option
+              [ value "", selected True ]
+              []
+            , option
+              [ value "Dwarf" ]
+              [ text "Dwarf" ]
+            ]
+          ]
+        , div
+          [ class "col-md-8" ]
+          [ text "Race img here" ]
+        ]
+      , table
+        []
+        [ tr
+          []
+          [ td
+            []
+            [ text "Str" ]
+          , td
+            []
+            [ text "Dex" ]
+          , td
+            []
+            [ text "Con" ]
+          , td
+            []
+            [ text "Int" ]
+          , td
+            []
+            [ text "Wis" ]
+          , td
+            []
+            [ text "Cha" ]
+          ]
+        , tr
+          []
+          [ td [] [ button [onClick StrUp] [text "⋀"] ]
+          , td [] [ button [onClick DexUp] [text "⋀"] ]
+          , td [] [ button [onClick ConUp] [text "⋀"] ]
+          , td [] [ button [onClick IntUp] [text "⋀"] ]
+          , td [] [ button [onClick WisUp] [text "⋀"] ]
+          , td [] [ button [onClick ChaUp] [text "⋀"] ]
+          ]
+        , tr
+          []
+          [ td
+            []
+            [ text <| String.fromInt model.strength ]
+          , td
+            []
+            [ text <| String.fromInt model.dextrerity ]
+          , td
+            []
+            [ text <| String.fromInt model.constitution ]
+          , td
+            []
+            [ text <| String.fromInt model.intelligence ]
+          , td
+            []
+            [ text <| String.fromInt model.wisdom ]
+          , td
+            []
+            [ text <| String.fromInt model.charisma ]
+          ]
+        , tr [] [ td [] [ button [onClick StrDn] [text "⋁"] ]
+          , td [] [ button [onClick DexDn] [text "⋁"] ]
+          , td [] [ button [onClick ConDn] [text "⋁"] ]
+          , td [] [ button [onClick IntDn] [text "⋁"] ]
+          , td [] [ button [onClick WisDn] [text "⋁"] ]
+          , td [] [ button [onClick ChaDn] [text "⋁"] ]
           ]
         ],
-      table [] [
-          tr [] [
-            td [] [text "Name"],
-            td [] [text model.name]
-          ],
-          tr [] [
-            td [] [text "Class"],
-            td [] [text model.classStr]
-            ],
-          tr [] [
-            td [] [text "HP"],
-            td [] [text (String.fromInt model.classAttr.hp)]
-            ],
-          tr [] [
-            td [] [text "Race:"],
-            td [] [text model.raceStr]
-            ],
-          tr [] [
-            td [] [text "Speed:"],
-            td [] [text (String.fromInt model.raceAttr.speed)]
-            ],
-          tr [] [
-            td [] [button [onClick CreateButton] [text "Test Create"]]
-            ]
-          ],
-          --
-          table [] [
-            tr [] [
-              td [] [text "Athletics"],
-              td [] [text <| String.fromInt model.skills.athletics]
-              ],
-            tr [] [
-              td [] [text "Acrobats"],
-              td [] [text <| String.fromInt model.skills.acrobats]
-              ],
-            tr [] [
-              td [] [text "Slieght Of Hand"],
-              td [] [text <| String.fromInt model.skills.slieghtOfHand]
-              ],
-            tr [] [
-              td [] [text "Stealth"],
-              td [] [text <| String.fromInt model.skills.stealth]
-              ],
-            tr [] [
-              td [] [text "Arcana"],
-              td [] [text <| String.fromInt model.skills.arcana]
-              ],
-            tr [] [
-              td [] [text "History"],
-              td [] [text <| String.fromInt model.skills.history]
-              ],
-            tr [] [
-              td [] [text "Investigation"],
-              td [] [text <| String.fromInt model.skills.investigation]
-              ],
-            tr [] [
-              td [] [text "Nature "],
-              td [] [text <| String.fromInt model.skills.nature]
-              ],
-            tr [] [
-              td [] [text "Religion"],
-              td [] [text <| String.fromInt model.skills.religion]
-              ],
-            tr [] [
-              td [] [text "Animal Handling"],
-              td [] [text <| String.fromInt model.skills.animalHandling]
-              ],
-            tr [] [
-              td [] [text "Insight"],
-              td [] [text <| String.fromInt model.skills.insight]
-              ],
-            tr [] [
-              td [] [text "Medicine"],
-              td [] [text <| String.fromInt model.skills.medicine]
-              ],
-            tr [] [
-              td [] [text "Perception"],
-              td [] [text <| String.fromInt model.skills.perception]
-              ],
-            tr [] [
-              td [] [text "Survival"],
-              td [] [text <| String.fromInt model.skills.survival]
-              ],
-            tr [] [
-              td [] [text "Deception"],
-              td [] [text <| String.fromInt model.skills.deception]
-              ],
-            tr [] [
-              td [] [text "Intimidation"],
-              td [] [text <| String.fromInt model.skills.intimidation]
-              ],
-            tr [] [
-              td [] [text "Performance"],
-              td [] [text <| String.fromInt model.skills.performance]
-              ],
-            tr [] [
-              td [] [text "Persuasion"],
-              td [] [text <| String.fromInt model.skills.persuasion]
-              ]
-          ],
-          text model.error
-
-    ]
+        text <| "Remaining Skill Points: " ++ String.fromInt model.skillPts
+      ]
+  ]
 
 
 addSkillFromStringList : Skills -> List String -> Int -> Skills
