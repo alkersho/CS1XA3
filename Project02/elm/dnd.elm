@@ -105,6 +105,7 @@ nullClassAttr =
 type alias RaceAttr = {
     speed : Int,
     bigness : String,
+    features : List String,
     strength : Int,
     dextrerity : Int,
     constitution : Int,
@@ -115,11 +116,11 @@ type alias RaceAttr = {
   }
 nullRaceAttr : RaceAttr
 nullRaceAttr =
-    { bigness = "", speed = 0, strength = 0, dextrerity = 0, constitution = 0, intelligence = 0, wisdom = 0, charisma = 0, imgUrl = "" }
+    { speed = 0, bigness = "", features = [], strength = 0, dextrerity = 0, constitution = 0, intelligence = 0, wisdom = 0, charisma = 0, imgUrl = "" }
 
 type alias BackgroundAttr = {
   languages : String,
-  money : Int,
+  money : Float,
   skills : List String,
   feature: String,
   equipment: String
@@ -185,12 +186,11 @@ type Msg = Name String
          | GetWeapon (Result Http.Error Weapon)
          | GetArmor (Result Http.Error Armor)
          | NextStep
-         | CreateButton
 
 --init
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( { stage = 1,
+    ( { stage = 0,
     name = "",
     classStr = "",
     raceStr = "",
@@ -409,21 +409,19 @@ update msg model =
               ({model | selectedArmor = val}, Cmd.none)
             Err error ->
               (errorHandler model error, Cmd.none)
-        CreateButton ->
-          if model.classStr /= "" && model.raceStr /= "" && model.background /= "" then
-            ({model | skills = (calcSkill model)}, Cmd.none)
-          else
-            ({model | error = "Please choose class, race and bg first"}, Cmd.none)
         NextStep ->
           if model.stage == 0 then
               if model.classAttr /= nullClassAttr && model.raceAttr /= nullRaceAttr && model.backgroundAttr /= nullBackgroundAttr then
-                ({model | stage = 1, skills = (calcSkill model)}, Cmd.batch [
+                ({model | stage = 1, skills = (calcSkill model), armorType = "light", weaponType = "Simple Melee"}, Cmd.batch [
                 (Http.get { url = "data.json", expect = Http.expectJson GetWeaponString (getWeaponNames "Simple Melee") }),
                 (Http.get { url = "data.json", expect = Http.expectJson GetArmorString (getArmorNames "light") })])
               else
                 ({model | error = "Please choose a Class, Race and Background."}, Cmd.none)
           else if model.stage == 1 then
-              ({model | error = "Didn't code the next stage yet"}, Cmd.none)
+              if model.backgroundAttr.money - (model.selectedArmor.cost + model.selectedWeapon.cost) < 0 then
+                ({model | error = "Not enough money to buy items!"}, Cmd.none)
+              else
+                ({model | stage = 2}, Cmd.none)
           else
               ({model | error = "WTF HAPPENED!!! " ++ String.fromInt model.stage}, Cmd.none)
 
@@ -461,6 +459,7 @@ decodeRace string =
     Decode.succeed RaceAttr
         |> custom (at ["races", string, "speed"] Decode.int)
         |> custom (at ["races", string, "size"] Decode.string)
+        |> custom (at ["races", string, "features"] (Decode.list Decode.string))
         |> custom (at ["races", string, "strength"] Decode.int)
         |> custom (at ["races", string, "dextrerity"] Decode.int)
         |> custom (at ["races", string, "constitution"] Decode.int)
@@ -473,7 +472,7 @@ decodeBackground : String -> Decode.Decoder BackgroundAttr
 decodeBackground string =
     Decode.map5 BackgroundAttr
         (at ["backgrounds", string, "languages"] Decode.string)
-        (at ["backgrounds", string, "money"] Decode.int)
+        (at ["backgrounds", string, "money"] Decode.float)
         (at ["backgrounds", string, "skills"] (Decode.list Decode.string))
         (at ["backgrounds", string, "feature"] Decode.string)
         (at ["backgrounds", string, "equipment"] Decode.string)
@@ -649,6 +648,8 @@ view model =
             chrView model
         1 ->
           eqView model
+        2 ->
+          finalView model
         _ ->
           text "Out of bounds"
 
@@ -832,10 +833,14 @@ eqView model =
           td [] [select [onInput SelectArmor] (armorOptions model.armorSelection)],
           td [] [text <| String.fromFloat model.selectedArmor.cost]
 
-      ]
         ],
+        tr [] [
+          td [] [text <| "Money Available: " ++ String.fromFloat model.backgroundAttr.money]
+        ]
+      ],
         text "Equipment From Class:",
         ul [] (classEq model),
+        button [onClick NextStep] [text "Create!"],
         text model.error
       ]
     ]
@@ -851,6 +856,190 @@ classEq model =
               []
     in classAux model.classAttr.starterEq
 
+finalView : Model -> Html Msg
+finalView model =
+    div [] [
+      node "link" [rel "stylesheet", href "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"] [],
+      table [style "width" "75%", style "margin-right" "auto", style "margin-left" "auto", style "text-align" "center"] [
+        tr [] [
+          td [] [text model.name],
+          td [] [text model.classStr],
+          td [] [text model.raceStr],
+          td [] [text model.background]
+        ]
+      ],
+      --stats and images
+      div [class "row"] [
+        div [class "col-lg"] [
+          table [style "width" "75%", style "margin-right" "25%"] [
+            tr [] [
+              td [] [
+                table [] [
+                  tr [] [
+                    td [] [text "Max HP:"], td [] [text <| getHP model]
+                  ],
+                  tr [] [
+                    td [] [text "Attack:"], td [] [text model.classAttr.dice]
+                  ],
+                  tr [] [
+                    td [] [text "Defence:"], td [] [text <| getDef model]
+                  ],
+                  tr [] [
+                    td [] [text "Speed:"], td [] [text <| String.fromInt model.raceAttr.speed]
+                  ],
+                  tr [] [
+                    td [] [text "Money:"] ,  td [] [text <| String.fromFloat <| model.backgroundAttr.money - model.selectedArmor.cost - model.selectedWeapon.cost]
+                  ]
+                ]
+              ],
+              td [] [
+                table [] [
+                  tr [] [
+                    td [] [text "Strength"], td [] [text <| (String.fromInt model.strength) ++ " (" ++ (String.fromInt ((model.strength - 10) //2)) ++")" ]
+                  ],
+                  tr [] [
+                    td [] [text "Dextrerity"], td [] [text <| (String.fromInt model.dextrerity) ++ " (" ++ (String.fromInt ((model.dextrerity - 10) //2)) ++")" ]
+                  ],
+                  tr [] [
+                    td [] [text "Intelligence"], td [] [text <| (String.fromInt model.intelligence) ++ " (" ++ (String.fromInt ((model.intelligence - 10) //2)) ++")" ]
+                  ],
+                  tr [] [
+                    td [] [text "Wisdom"], td [] [text <| (String.fromInt model.wisdom) ++ " (" ++ (String.fromInt ((model.wisdom - 10) //2)) ++")" ]
+                  ],
+                  tr [] [
+                    td [] [text "Constitution"], td [] [text <| (String.fromInt model.constitution) ++ " (" ++ (String.fromInt ((model.constitution - 10) //2)) ++")" ]
+                  ],
+                  tr [] [
+                    td [] [text "Charisma"], td [] [text <| (String.fromInt model.charisma) ++ " (" ++ (String.fromInt ((model.charisma - 10) //2)) ++")" ]
+                  ]
+                ]
+              ],
+              td [] [
+                table [] [
+                  tr [] [
+                    td [] [text "Athletics"], td [] [text <| String.fromInt model.skills.athletics]
+                  ],
+                  tr [] [
+                    td [] [text "Acrobats"], td [] [text <| String.fromInt model.skills.acrobats]
+                  ],
+                  tr [] [
+                    td [] [text "Slieght of Hand"], td [] [text <| String.fromInt model.skills.slieghtOfHand]
+                  ],
+                  tr [] [
+                    td [] [text "Stealth"], td [] [text <| String.fromInt model.skills.stealth]
+                  ],
+                  tr [] [
+                    td [] [text "Arcana"], td [] [text <| String.fromInt model.skills.arcana]
+                  ],
+                  tr [] [
+                    td [] [text "History"], td [] [text <| String.fromInt model.skills.history]
+                  ],
+                  tr [] [
+                    td [] [text "Investigation"], td [] [text <| String.fromInt model.skills.investigation]
+                  ],
+                  tr [] [
+                    td [] [text "Nature"], td [] [text <| String.fromInt model.skills.nature]
+                  ],
+                  tr [] [
+                    td [] [text "Religion"], td [] [text <| String.fromInt model.skills.religion]
+                  ],
+                  tr [] [
+                    td [] [text "Animal Handling"], td [] [text <| String.fromInt model.skills.animalHandling]
+                  ],
+                  tr [] [
+                    td [] [text "Insight"], td [] [text <| String.fromInt model.skills.insight]
+                  ],
+                  tr [] [
+                    td [] [text "Medicine"], td [] [text <| String.fromInt model.skills.medicine]
+                  ],
+                  tr [] [
+                    td [] [text "Perception"], td [] [text <| String.fromInt model.skills.perception]
+                  ],
+                  tr [] [
+                    td [] [text "Survival"], td [] [text <| String.fromInt model.skills.survival]
+                  ],
+                  tr [] [
+                    td [] [text "Deception"], td [] [text <| String.fromInt model.skills.deception]
+                  ],
+                  tr [] [
+                    td [] [text "Intimidation"], td [] [text <| String.fromInt model.skills.intimidation]
+                  ],
+                  tr [] [
+                    td [] [text "Performance"], td [] [text <| String.fromInt model.skills.performance]
+
+                  ],
+                  tr [] [
+                    td [] [text "Persuasion"], td [] [text <| String.fromInt model.skills.persuasion]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ],
+        div [class "col-lg"] [
+          img [src model.classAttr.imgUrl, style "max-width" "250px"] [],
+          img [src model.raceAttr.imgUrl, style "max-width" "250px"] []
+        ]
+      ],
+      --Features and Proficiencies
+      div [class "row"] [
+        div [class "col-lg"] [
+          text "Armor Proficiency",
+          ul [] <| List.map (\a -> li [] [text a]) model.classAttr.proArmour,
+          text "Weapon Proficiency",
+          ul [] <| List.map (\x -> li [] [text x]) model.classAttr.proWeapon,
+          text "Tools Proficiency",
+          ul [] <| List.map (\x -> li [] [text x]) model.classAttr.proTools,
+          text "Class Features",
+          ul [] <| List.map (\x -> li [] [text x]) model.classAttr.feautes,
+          text "Race Features",
+          ul [] <| List.map (\x -> li [] [text x]) model.raceAttr.features,
+          text "Background Features",
+          ul [] [li [] [text model.backgroundAttr.feature]]
+        ],
+        div [class "col-lg"] [
+          text "Equipment",
+          ul [] <| List.map (\x -> li [] [text x]) model.classAttr.starterEq ++ [li [] [text model.backgroundAttr.equipment]]
+        ]
+      ]
+  ]
+
+getHP : Model -> String
+getHP model =
+    case model.classAttr.hpMode of
+        "str" ->
+            String.fromInt <| model.classAttr.hp + (model.strength - 10) //2
+        "dex" ->
+            String.fromInt <| model.classAttr.hp + (model.dextrerity - 10) //2
+        "int" ->
+            String.fromInt <| model.classAttr.hp + (model.intelligence - 10) //2
+        "wis" ->
+            String.fromInt <| model.classAttr.hp + (model.wisdom - 10) //2
+        "con" ->
+            String.fromInt <| model.classAttr.hp + (model.constitution - 10) //2
+        "cha" ->
+            String.fromInt <| model.classAttr.hp + (model.charisma - 10) //2
+
+        _ ->
+          String.fromInt model.classAttr.hp
+
+getDef : Model -> String
+getDef model =
+    case model.selectedArmor.statMod of
+        "str" ->
+          String.fromInt <| model.selectedArmor.baseAC + (model.strength - 10) //2 + model.classAttr.proBunus
+        "dex" ->
+          String.fromInt <| model.selectedArmor.baseAC + (model.dextrerity - 10) //2 + model.classAttr.proBunus
+        "int" ->
+          String.fromInt <| model.selectedArmor.baseAC + (model.intelligence - 10) //2 + model.classAttr.proBunus
+        "wis" ->
+          String.fromInt <| model.selectedArmor.baseAC + (model.wisdom - 10) //2 + model.classAttr.proBunus
+        "con" ->
+          String.fromInt <| model.selectedArmor.baseAC + (model.constitution - 10) //2 + model.classAttr.proBunus
+        "cha" ->
+          String.fromInt <| model.selectedArmor.baseAC + (model.charisma - 10) //2 + model.classAttr.proBunus
+        _ ->
+            String.fromInt <| model.selectedArmor.baseAC + model.classAttr.proBunus
 
 addSkillFromStringList : Skills -> List String -> Int -> Skills
 addSkillFromStringList sk s i =
@@ -940,6 +1129,7 @@ weaponsOptions xs =
         [] ->
           []
   in weaponsOptionsAux 0 xs
+
 --Armor lists handling
 getArmorNames : String -> Decode.Decoder (List String)
 getArmorNames string =
