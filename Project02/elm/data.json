@@ -9,8 +9,24 @@
       "proTools": [],
       "savingThrows": ["str", "con"],
       "skills": ["Intimidation", "Survival"],
-      "weapons": ["Martial Melee Weapon", "Simple Weapon"],
-      "starterEq": ["An explorer’s pack and four javelins"],
+      "weapons": [{
+          "name": "Battleaxe",
+          "cost": 10,
+          "dmg": "1d8",
+          "dmgtp": "Slashing",
+          "weight": 4,
+          "prop": "aVersatile(1d10)"
+        },
+        {
+          "name": "Greatclub",
+          "cost": 0.2,
+          "dmg": "1d8",
+          "dmgtp": "Buldgeoning",
+          "weight": 10,
+          "prop": "Two-handed"
+        }
+      ],
+      "starterEq": ["An explorer’s pack and four javelins", "Battleaxe", "Greatclub"],
       "cantrips": [],
       "spells": [],
       "dice": "1d12",
@@ -43,7 +59,7 @@
     }
   },
   "Weapons": {
-    "simple melee": [{
+    "Simple Melee": [{
         "name": "Club",
         "cost": 0.1,
         "dmg": "1d4",
@@ -68,9 +84,9 @@
         "prop": "Two-handed"
       }
     ],
-    "simple ranged": [{
+    "Simple Ranged": [{
         "name": "Crossbow, light",
-        "costGP": 25,
+        "cost": 25,
         "dmg": "1d8",
         "dmgtp": "Piercing",
         "weight": 5,
@@ -93,7 +109,7 @@
         "prop": "Ammunition (range 80/320), two-handed"
       }
     ],
-    "martial melee": [{
+    "Martial Melee": [{
         "name": "Battleaxe",
         "cost": 10,
         "dmg": "1d8",
@@ -118,7 +134,7 @@
         "prop": "Heavy, reach, two-handed"
       }
     ],
-    "martial ranged": [{
+    "Martial Ranged": [{
         "name": "Blowgun",
         "cost": 10,
         "dmg": "1",
@@ -266,4 +282,5 @@
     "mod": "",
     "modMax": 0
   }
+
 }
