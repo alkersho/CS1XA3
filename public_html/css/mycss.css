@@ -1,0 +1,96 @@
+.Primary {
+    background-color:#ff5722;
+    color: black;
+    text-align: center;
+    padding:50px 0;
+    box-shadow: 0px 10px 20px #bfbfbf;
+    margin-bottom: 15px
+}
+
+.Primary-link {
+    background-color:#ff5722;
+    color: black;
+}
+
+.Primary-link:hover {
+    background-color: #ff8a50;
+    color: black;
+    -webkit-transition: background-color 100ms linear;
+    -ms-transition: background-color 100ms linear;
+    transition: background-color 100ms linear;
+} 
+
+.Primary-dark {
+    background-color:#c41c00;
+    color:white
+}
+
+.Secondary {
+    background-color:#ff6d00;
+    color:black;
+}
+
+.Secondary-link {
+    background-color:#ff6d00;
+    color: black;
+}
+
+.Secondary-link:hover {
+    background-color: #ff9e40;
+    color: black
+}
+
+.Secondary-dark {
+    background-color:#c43c00;
+    color: white;
+}
+
+.main_body{
+    padding: 30px 30px 0px 30px;
+}
+
+.contacts{
+    padding: 30px 10px 30px 30px;
+    box-shadow: 0px -5px 20px 0px #bfbfbf;
+    border-radius: 15px;
+    height: fit-content;
+}
+
+.header-holder{
+    margin-bottom: 20px;
+    margin-left: 0px;
+    /* border-bottom-width: 2px; */
+}
+
+.profile-img {
+    border-radius: 15px;
+    box-shadow: 0 0 20px 0 #bfbfbf;
+    width: inherit;
+    max-width: 300px;
+}
+
+.my-card{
+    border-radius: 5px;
+    margin-top: 25px;
+    /* border-width: thin;
+    border-style: solid; */
+    padding: 0px;
+    box-shadow: 0 0 10px 0 #bfbfbf;
+    overflow: hidden;
+}
+
+.my-card-head{
+    padding: 5px;
+    transition: background-color 150ms linear;
+    cursor: pointer;
+}
+
+.my-card-head:active{
+    background: lightgrey;
+    /* transition: background-color 250ms ease-in-out; */
+}
+
+
+.info{
+    margin: 20px 10px 20px 10px;
+}
