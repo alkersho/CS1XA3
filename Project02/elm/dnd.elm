@@ -7,6 +7,7 @@ import Http
 import Json.Decode as Decode exposing (at)
 import Json.Decode.Pipeline exposing (custom)
 import Browser
+import Maybe exposing (withDefault)
 
 main : Program () Model Msg
 main =
@@ -39,7 +40,11 @@ type alias Model = {
     created : Bool,
     skills : Skills,
     weaponSelection : List String,
-    armorSelection : List String
+    armorSelection : List String,
+    weaponType : String,
+    armorType : String,
+    selectedWeapon : Weapon,
+    selectedArmor : Armor
   }
 
 type alias Skills = {
@@ -85,7 +90,7 @@ type alias ClassAttr = {
     proTools : List String,
     savingThrows : List String,
     skills : List String,
-    weapons : List String,
+    weapons : List Weapon,
     starterEq: List String,
     cantrips : List String,
     spells : List String,
@@ -98,8 +103,8 @@ nullClassAttr =
     { proBunus = 0, hp = 0, hpMode = "", proArmour = [], proWeapon = [], proTools = [], savingThrows = [], skills = [], weapons = [], starterEq = [], cantrips = [], spells = [], dice = "", feautes = [], imgUrl = "" }
 
 type alias RaceAttr = {
-    bigness : String,
     speed : Int,
+    bigness : String,
     strength : Int,
     dextrerity : Int,
     constitution : Int,
@@ -123,6 +128,33 @@ type alias BackgroundAttr = {
 nullBackgroundAttr : BackgroundAttr
 nullBackgroundAttr =
     { languages = "", money = 0, skills = [], feature = "", equipment = "" }
+
+type alias Weapon = {
+    name : String,
+    cost : Float,
+    dmg : String,
+    dmgType : String,
+    weight : Int,
+    prop : String
+  }
+
+nullWeapon : Weapon
+nullWeapon =
+    { name = "", cost = 0, dmg = "", dmgType = "", weight = 0, prop = "" }
+
+type alias Armor = {
+    name : String,
+    baseAC : Int,
+    stealthDis : Bool,
+    cost : Float,
+    weight : Int,
+    statMod : String,
+    modMax : Int
+  }
+
+nullArmor : Armor
+nullArmor =
+    { name = "", baseAC = 0, stealthDis = False, cost = 0, weight = 0, statMod = "", modMax = 0 }
 --msgs
 type Msg = Name String
          | ClassStr String
@@ -131,6 +163,8 @@ type Msg = Name String
          | Alignment String
          | WeaponString String
          | ArmorString String
+         | SelectWeapon String
+         | SelectArmor String
          | StrUp
          | StrDn
          | DexUp
@@ -146,8 +180,10 @@ type Msg = Name String
          | GetClass (Result Http.Error ClassAttr)
          | GetRace (Result Http.Error RaceAttr)
          | GetBackground (Result Http.Error BackgroundAttr)
-         | GetWeapons (Result Http.Error (List String))
-         | GetArmor (Result Http.Error (List String))
+         | GetWeaponString (Result Http.Error (List String))
+         | GetArmorString (Result Http.Error (List String))
+         | GetWeapon (Result Http.Error Weapon)
+         | GetArmor (Result Http.Error Armor)
          | NextStep
          | CreateButton
 
@@ -174,8 +210,11 @@ init _ =
     created = False,
     skills = nullSkills,
     weaponSelection = [],
-    armorSelection = []}, Cmd.none)
-
+    armorSelection = [],
+    weaponType = "",
+    armorType = "",
+    selectedWeapon = nullWeapon,
+    selectedArmor = nullArmor}, Cmd.none)
 
 --update
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -201,18 +240,22 @@ update msg model =
         Alignment string ->
           ({model | alignment = string}, Cmd.none)
         WeaponString str ->
-          (model, (Http.get { url = "data.json", expect = Http.expectJson GetWeapons (getWeaponNames str) }))
+          ({model | weaponType = str}, (Http.get { url = "data.json", expect = Http.expectJson GetWeaponString (getWeaponNames str) }))
         ArmorString str ->
-          (model, (Http.get { url = "data.json", expect = Http.expectJson GetArmor (getArmorNames str) }))
+          ({model | armorType = str}, (Http.get { url = "data.json", expect = Http.expectJson GetArmorString (getArmorNames str) }))
+        SelectWeapon str ->
+          (model, Http.get { url = "data.json", expect = Http.expectJson GetWeapon <| decodeWeapon  (withDefault 0 <| String.toInt str) model.weaponType })
+        SelectArmor i ->
+          (model, Http.get { url = "data.json", expect = Http.expectJson GetArmor (decodeArmor (withDefault 0 <|  String.toInt i) model.armorType) })
         StrDn ->
           if model.strength == 8 then
             (model, Cmd.none)
-          else if model.strength < 15 then
+          else if model.strength < 14 then
             ({model | strength = model.strength - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | strength = model.strength - 1, skillPts = model.skillPts + 2}, Cmd.none)
         StrUp ->
-          if model.strength < 14 then
+          if model.strength < 13 then
             if model.skillPts - 1 >= 0 then
               ({model | strength = model.strength + 1, skillPts =  model.skillPts - 1}, Cmd.none)
             else
@@ -227,12 +270,12 @@ update msg model =
         DexDn ->
           if model.dextrerity == 8 then
             (model, Cmd.none)
-          else if model.dextrerity < 15 then
+          else if model.dextrerity < 14 then
             ({model | dextrerity = model.dextrerity - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | dextrerity = model.dextrerity - 1, skillPts = model.skillPts + 2}, Cmd.none)
         DexUp ->
-          if model.dextrerity < 14 then
+          if model.dextrerity < 13 then
             if model.skillPts - 1 >= 0 then
               ({model | dextrerity = model.dextrerity + 1, skillPts =  model.skillPts - 1}, Cmd.none)
             else
@@ -247,12 +290,12 @@ update msg model =
         ConDn ->
           if model.constitution == 8 then
             (model, Cmd.none)
-          else if model.constitution < 15 then
+          else if model.constitution < 14 then
             ({model | constitution = model.constitution - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | constitution = model.constitution - 1, skillPts = model.skillPts + 2}, Cmd.none)
         ConUp ->
-          if model.constitution < 14 then
+          if model.constitution < 13 then
             if model.skillPts - 1 >= 0 then
               ({model | constitution = model.constitution + 1, skillPts =  model.skillPts - 1}, Cmd.none)
             else
@@ -267,12 +310,12 @@ update msg model =
         IntDn ->
           if model.intelligence == 8 then
             (model, Cmd.none)
-          else if model.intelligence < 15 then
+          else if model.intelligence < 14 then
             ({model | intelligence = model.intelligence - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | intelligence = model.intelligence - 1, skillPts = model.skillPts + 2}, Cmd.none)
         IntUp ->
-          if model.intelligence < 14 then
+          if model.intelligence < 13 then
             if model.skillPts - 1 >= 0 then
               ({model | intelligence = model.intelligence + 1, skillPts =  model.skillPts - 1}, Cmd.none)
             else
@@ -287,12 +330,12 @@ update msg model =
         WisDn ->
           if model.wisdom == 8 then
             (model, Cmd.none)
-          else if model.wisdom < 15 then
+          else if model.wisdom < 14 then
             ({model | wisdom = model.wisdom - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | wisdom = model.wisdom - 1, skillPts = model.skillPts + 2}, Cmd.none)
         WisUp ->
-          if model.wisdom < 14 then
+          if model.wisdom < 13 then
             if model.skillPts - 1 >= 0 then
               ({model | wisdom = model.wisdom + 1, skillPts =  model.skillPts - 1}, Cmd.none)
             else
@@ -307,12 +350,12 @@ update msg model =
         ChaDn ->
           if model.charisma == 8 then
             (model, Cmd.none)
-          else if model.charisma < 15 then
+          else if model.charisma < 14 then
             ({model | charisma= model.charisma - 1, skillPts = model.skillPts + 1}, Cmd.none)
           else
             ({model | charisma = model.charisma - 1, skillPts = model.skillPts + 2}, Cmd.none)
         ChaUp ->
-          if model.charisma < 14 then
+          if model.charisma < 13 then
             if model.skillPts - 1 >= 0 then
               ({model | charisma = model.charisma + 1, skillPts =  model.skillPts - 1}, Cmd.none)
             else
@@ -342,18 +385,30 @@ update msg model =
               ({model | backgroundAttr=val}, Cmd.none)
             Err error ->
               (errorHandler model error, Cmd.none)
-        GetWeapons result ->
+        GetWeaponString result ->
           case result of
             Ok val ->
               ({model | weaponSelection = val}, Cmd.none)
             Err val ->
               ((errorHandler model val), Cmd.none)
-        GetArmor result ->
+        GetArmorString result ->
           case result of
             Ok val ->
               ({model | armorSelection = val}, Cmd.none)
             Err val ->
               ((errorHandler model val), Cmd.none)
+        GetWeapon result ->
+          case result of
+            Ok val ->
+              ({model | selectedWeapon = val}, Cmd.none)
+            Err error ->
+              (errorHandler model error, Cmd.none)
+        GetArmor result ->
+          case result of
+            Ok val ->
+              ({model | selectedArmor = val}, Cmd.none)
+            Err error ->
+              (errorHandler model error, Cmd.none)
         CreateButton ->
           if model.classStr /= "" && model.raceStr /= "" && model.background /= "" then
             ({model | skills = (calcSkill model)}, Cmd.none)
@@ -363,8 +418,8 @@ update msg model =
           if model.stage == 0 then
               if model.classAttr /= nullClassAttr && model.raceAttr /= nullRaceAttr && model.backgroundAttr /= nullBackgroundAttr then
                 ({model | stage = 1, skills = (calcSkill model)}, Cmd.batch [
-                (Http.get { url = "data.json", expect = Http.expectJson GetWeapons (getWeaponNames "simple melee") }),
-                (Http.get { url = "data.json", expect = Http.expectJson GetArmor (getArmorNames "light") })])
+                (Http.get { url = "data.json", expect = Http.expectJson GetWeaponString (getWeaponNames "Simple Melee") }),
+                (Http.get { url = "data.json", expect = Http.expectJson GetArmorString (getArmorNames "light") })])
               else
                 ({model | error = "Please choose a Class, Race and Background."}, Cmd.none)
           else if model.stage == 1 then
@@ -372,12 +427,19 @@ update msg model =
           else
               ({model | error = "WTF HAPPENED!!! " ++ String.fromInt model.stage}, Cmd.none)
 
-
-
 --decoders
 decodeClass : String -> Decode.Decoder ClassAttr
 decodeClass str =
-  Decode.succeed ClassAttr
+  let
+      decodeWeaponClass = Decode.succeed Weapon
+        |> custom (at ["name"] Decode.string)
+        |> custom (at ["cost"] Decode.float)
+        |> custom (at ["dmg"] Decode.string)
+        |> custom (at ["dmgtp"] Decode.string)
+        |> custom (at ["weight"] Decode.int)
+        |> custom (at ["prop"] Decode.string)
+  in
+   Decode.succeed ClassAttr
     |> custom (at ["classes", str, "proBunus"] Decode.int)
     |> custom (at ["classes", str, "hp"] Decode.int)
     |> custom (at ["classes", str, "hpMode"] Decode.string)
@@ -386,7 +448,7 @@ decodeClass str =
     |> custom (at ["classes", str, "proTools"] (Decode.list Decode.string))
     |> custom (at ["classes", str, "savingThrows"] (Decode.list Decode.string))
     |> custom (at ["classes", str, "skills"] (Decode.list Decode.string))
-    |> custom (at ["classes", str, "weapons"] (Decode.list Decode.string))
+    |> custom (at ["classes", str, "weapons"] (Decode.list decodeWeaponClass))
     |> custom (at ["classes", str, "starterEq"] (Decode.list Decode.string))
     |> custom (at ["classes", str, "cantrips"] (Decode.list Decode.string))
     |> custom (at ["classes", str, "spells"] (Decode.list Decode.string))
@@ -397,8 +459,8 @@ decodeClass str =
 decodeRace : String -> Decode.Decoder RaceAttr
 decodeRace string =
     Decode.succeed RaceAttr
-        |> custom (at ["races", string, "size"] Decode.string)
         |> custom (at ["races", string, "speed"] Decode.int)
+        |> custom (at ["races", string, "size"] Decode.string)
         |> custom (at ["races", string, "strength"] Decode.int)
         |> custom (at ["races", string, "dextrerity"] Decode.int)
         |> custom (at ["races", string, "constitution"] Decode.int)
@@ -416,24 +478,25 @@ decodeBackground string =
         (at ["backgrounds", string, "feature"] Decode.string)
         (at ["backgrounds", string, "equipment"] Decode.string)
 
+decodeWeapon : Int -> String -> Decode.Decoder Weapon
+decodeWeapon i str = Decode.succeed Weapon
+  |> custom (at ["Weapons", str] (Decode.index i (Decode.field "name" Decode.string)))
+  |> custom (at ["Weapons", str] (Decode.index i (Decode.field "cost" Decode.float)))
+  |> custom (at ["Weapons", str] (Decode.index i (Decode.field "dmg" Decode.string)))
+  |> custom (at ["Weapons", str] (Decode.index i (Decode.field "dmgtp" Decode.string)))
+  |> custom (at ["Weapons", str] (Decode.index i (Decode.field "weight" Decode.int)))
+  |> custom (at ["Weapons", str] (Decode.index i (Decode.field "prop" Decode.string)))
 
-errorHandler : Model -> Http.Error -> Model
-errorHandler model error =
-    case error of
-        Http.BadUrl url ->
-            { model | error = "bad url: " ++ url }
-
-        Http.Timeout ->
-            { model | error = "timeout" }
-
-        Http.NetworkError ->
-            { model | error = "network error" }
-
-        Http.BadStatus i ->
-            { model | error = "bad status " ++ String.fromInt i }
-
-        Http.BadBody body ->
-            { model | error = "bad body " ++ body }
+decodeArmor : Int -> String -> Decode.Decoder Armor
+decodeArmor i str =
+  Decode.succeed Armor
+    |> custom (at ["armours", str] (Decode.index i (Decode.field "name" Decode.string)))
+    |> custom (at ["armours", str] (Decode.index i (Decode.field "baseAC" Decode.int)))
+    |> custom (at ["armours", str] (Decode.index i (Decode.field "stealthDis" Decode.bool)))
+    |> custom (at ["armours", str] (Decode.index i (Decode.field "cost" Decode.float)))
+    |> custom (at ["armours", str] (Decode.index i (Decode.field "weight" Decode.int)))
+    |> custom (at ["armours", str] (Decode.index i (Decode.field "mod" Decode.string)))
+    |> custom (at ["armours", str] (Decode.index i (Decode.field "modMax" Decode.int)))
 
 --view
 --temp layout
@@ -745,53 +808,48 @@ eqView model =
       node "link" [rel "stylesheet", href "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"] []
       , div [class "container"] [
         table [][
+          tr [] [td [] [],td [] [],td [] []
+            ,td [] [text "Cost: "]
+            ],
           tr [] [
-          td [] [text "Weapon:"],
-          td [] [select [onInput WeaponString] [
-            option [value "simple melee"] [text "Simple Melee"],
-            option [value "simple ranged"] [text "Simple Ranged"],
-            option [value "martial melee"] [text "Martial Melee"],
-            option [value "martial ranged"] [text "Martial Ranged"]
-          ]],
-          td [] [select [] (weaponsOptions model.weaponSelection)]
-        ]
+            td [] [text "Weapon:"],
+            td [] [select [onInput WeaponString] [
+              option [value "Simple Melee"] [text "Simple Melee"],
+              option [value "Simple Ranged"] [text "Simple Ranged"],
+              option [value "Martial Melee"] [text "Martial Melee"],
+              option [value "Martial Ranged"] [text "Martial Ranged"]
+            ]],
+            td [] [select [onInput SelectWeapon] (weaponsOptions model.weaponSelection)],
+            td [] [text <| String.fromFloat model.selectedWeapon.cost]
         ],
-        table [][
-          tr [] [
+        tr [] [
           td [] [text "Armor:"],
           td [] [select [onInput ArmorString] [
             option [value "light"] [text "Light"],
             option [value "medium"] [text "Medium"],
             option [value "heavy"] [text "Heavy"]
           ]],
-          td [] [select [] (armorOptions model.armorSelection)]
-        ]
+          td [] [select [onInput SelectArmor] (armorOptions model.armorSelection)],
+          td [] [text <| String.fromFloat model.selectedArmor.cost]
+
+      ]
         ],
+        text "Equipment From Class:",
+        ul [] (classEq model),
         text model.error
       ]
     ]
 
-weaponsOptions : (List String) -> List (Html Msg)
-weaponsOptions xs =
-  let
-      weaponsOptionsAux n ys =
-        case ys of
-          y::zs ->
-            option [value (String.fromInt n)] [text y]:: weaponsOptionsAux (n+1) zs
-          [] ->
-            []
-  in weaponsOptionsAux 0 xs
-
-armorOptions : (List String) -> List (Html Msg)
-armorOptions xs =
-  let
-      weaponsOptionsAux n ys =
-        case ys of
-          y::zs ->
-            option [value (String.fromInt n)] [text y]:: weaponsOptionsAux (n+1) zs
-          [] ->
-            []
-  in weaponsOptionsAux 0 xs
+classEq : Model -> List (Html Msg)
+classEq model =
+    let
+        classAux ls =
+          case ls of
+            s::l ->
+              li [] [text s]:: classAux l
+            [] ->
+              []
+    in classAux model.classAttr.starterEq
 
 
 addSkillFromStringList : Skills -> List String -> Int -> Skills
@@ -863,6 +921,7 @@ calcSkill model =
     skillsBG = model.backgroundAttr.skills
   in addSkillFromStringList (addSkillFromStringList sk skillsClass model.classAttr.proBunus) skillsBG model.classAttr.proBunus
 
+--weapon list handling
 getWeaponNames : String -> Decode.Decoder (List String)
 getWeaponNames str =
   at ["Weapons", str] <| Decode.list weaponNamesDecoder
@@ -871,6 +930,17 @@ weaponNamesDecoder : Decode.Decoder String
 weaponNamesDecoder =
   Decode.field "name" Decode.string
 
+weaponsOptions : (List String) -> List (Html Msg)
+weaponsOptions xs =
+  let
+    weaponsOptionsAux n ys =
+      case ys of
+        y::zs ->
+          option [value (String.fromInt n)] [text y]:: weaponsOptionsAux (n+1) zs
+        [] ->
+          []
+  in weaponsOptionsAux 0 xs
+--Armor lists handling
 getArmorNames : String -> Decode.Decoder (List String)
 getArmorNames string =
     at ["armours", string] <| Decode.list armorNamesDecoder
@@ -878,3 +948,32 @@ getArmorNames string =
 armorNamesDecoder : Decode.Decoder String
 armorNamesDecoder =
     Decode.field "name" Decode.string
+
+armorOptions : (List String) -> List (Html Msg)
+armorOptions xs =
+  let
+    weaponsOptionsAux n ys =
+      case ys of
+        y::zs ->
+          option [value (String.fromInt n)] [text y]:: weaponsOptionsAux (n+1) zs
+        [] ->
+          []
+  in weaponsOptionsAux 0 xs
+
+errorHandler : Model -> Http.Error -> Model
+errorHandler model error =
+    case error of
+        Http.BadUrl url ->
+            { model | error = "bad url: " ++ url }
+
+        Http.Timeout ->
+            { model | error = "timeout" }
+
+        Http.NetworkError ->
+            { model | error = "network error" }
+
+        Http.BadStatus i ->
+            { model | error = "bad status " ++ String.fromInt i }
+
+        Http.BadBody body ->
+            { model | error = "bad body " ++ body }
