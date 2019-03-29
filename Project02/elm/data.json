@@ -1,0 +1,286 @@
+{
+  "classes": {
+    "Barbarian": {
+      "proBunus": 2,
+      "hp": 12,
+      "hpMode": "con",
+      "proArmor": ["Light Armor", "Medium Armor", "Shields"],
+      "proWeapon": ["Simple Weapons", "Martial Weapons"],
+      "proTools": [],
+      "savingThrows": ["str", "con"],
+      "skills": ["Intimidation", "Survival"],
+      "weapons": [{
+          "name": "Battleaxe",
+          "cost": 10,
+          "dmg": "1d8",
+          "dmgtp": "Slashing",
+          "weight": 4,
+          "prop": "aVersatile(1d10)"
+        },
+        {
+          "name": "Greatclub",
+          "cost": 0.2,
+          "dmg": "1d8",
+          "dmgtp": "Buldgeoning",
+          "weight": 10,
+          "prop": "Two-handed"
+        }
+      ],
+      "starterEq": ["An explorer’s pack and four javelins", "Battleaxe", "Greatclub"],
+      "cantrips": [],
+      "spells": [],
+      "dice": "1d12",
+      "features": ["Unarmored Defense", "Reckless Attack", "Danger Sense"],
+      "img-url": "https://media-waterdeep.cursecdn.com/avatars/thumbnails/6/342/420/618/636272680339895080.png"
+    }
+  },
+  "races": {
+    "Dwarf": {
+      "size": "Medium",
+      "speed": 25,
+      "features": ["Darkvision", " Dwarven Resilience", "Dwarven Combat Training(You have proficiency with the battleaxe, handaxe, light hammer, and warhammer.)", "Tool Proficiency(You gain proficiency with the artisan’s tools of your choice: smith’s tools, brewer’s supplies, or mason’s tools.)", "Stonecunning(Whenever you make an Intelligence check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus.)"],
+      "languages": "Common Dwarvish",
+      "strength": 0,
+      "dextrerity": 0,
+      "constitution": 2,
+      "intelligence": 0,
+      "charisma": 0,
+      "wisdom": 0,
+      "img-url": "https://media-waterdeep.cursecdn.com/avatars/thumbnails/6/254/420/618/636271781394265550.png"
+    }
+  },
+  "backgrounds": {
+    "Acolyte": {
+      "skills": ["Insight", "Religion"],
+      "languages": "Two of your choice.",
+      "equipment": "A holy symbol (a gift to you when you entered the priesthood), a prayer book or prayer wheel, 5 sticks of incense, vestments, a set of common clothes, and a pouch containing 15 gp",
+      "money": 15,
+      "feature": "Shelter of the Faithful"
+    }
+  },
+  "Weapons": {
+    "Simple Melee": [{
+        "name": "Club",
+        "cost": 0.1,
+        "dmg": "1d4",
+        "dmgtp": "Buldgeoning",
+        "weight": 2,
+        "prop": "Light"
+      },
+      {
+        "name": "Dagger",
+        "cost": 2,
+        "dmg": "1d4",
+        "dmgtp": "Piercing",
+        "weight": 1,
+        "prop": "Finesse, light, thrown (range 20/60)"
+      },
+      {
+        "name": "Greatclub",
+        "cost": 0.2,
+        "dmg": "1d8",
+        "dmgtp": "Buldgeoning",
+        "weight": 10,
+        "prop": "Two-handed"
+      }
+    ],
+    "Simple Ranged": [{
+        "name": "Crossbow, light",
+        "cost": 25,
+        "dmg": "1d8",
+        "dmgtp": "Piercing",
+        "weight": 5,
+        "prop": "Ammunition (range 80/320), loading, two-handed"
+      },
+      {
+        "name": "Dart",
+        "cost": 0.25,
+        "dmg": "1d4",
+        "dmgtp": "Buldgeoning",
+        "weight": 2,
+        "prop": "Light"
+      },
+      {
+        "name": "Shortbow",
+        "cost": 25,
+        "dmg": "1d6",
+        "dmgtp": "Piercing",
+        "weight": 2,
+        "prop": "Ammunition (range 80/320), two-handed"
+      }
+    ],
+    "Martial Melee": [{
+        "name": "Battleaxe",
+        "cost": 10,
+        "dmg": "1d8",
+        "dmgtp": "Slashing",
+        "weight": 4,
+        "prop": "Versatile(1d10)"
+      },
+      {
+        "name": "Flail",
+        "cost": 10,
+        "dmg": "1d8",
+        "dmgtp": "Buldgeoning",
+        "weight": 2,
+        "prop": ""
+      },
+      {
+        "name": "Glaive",
+        "cost": 20,
+        "dmg": "1d10",
+        "dmgtp": "Slashing",
+        "weight": 6,
+        "prop": "Heavy, reach, two-handed"
+      }
+    ],
+    "Martial Ranged": [{
+        "name": "Blowgun",
+        "cost": 10,
+        "dmg": "1",
+        "dmgtp": "Piercing",
+        "weight": 1,
+        "prop": "Ammunition(range 25/100), loading"
+      },
+      {
+        "name": "Corssbow, hand",
+        "cost": 75,
+        "dmg": "1d6",
+        "dmgtp": "Piercing",
+        "weight": 3,
+        "prop": "Ammunition (range 30/120), light, loading"
+      },
+      {
+        "name": "Crossbow, heavy",
+        "cost": 50,
+        "dmg": "1d10",
+        "dmgtp": "Piercing",
+        "weight": 18,
+        "prop": "Ammunition (range 100/400), heavy, loading, two-handedt"
+      }
+    ]
+  },
+  "armours": {
+    "light": [{
+        "name": "Padded",
+        "baseAC": 11,
+        "stealthDis": true,
+        "cost": 5,
+        "weight": 8,
+        "mod": "dex",
+        "modMax": 99999999
+      },
+      {
+        "name": "Leather",
+        "baseAC": 11,
+        "stealthDis": false,
+        "cost": 10,
+        "weight": 10,
+        "mod": "dex",
+        "modMax": 99999999
+      },
+      {
+        "name": "Studded Leather",
+        "baseAC": 12,
+        "stealthDis": false,
+        "cost": 45,
+        "weight": 13,
+        "mod": "dex",
+        "modMax": 99999999
+      }
+    ],
+    "medium": [{
+        "name": "Hide",
+        "baseAC": 12,
+        "stealthDis": false,
+        "cost": 10,
+        "weight": 12,
+        "mod": "dex",
+        "modMax": 2
+      },
+      {
+        "name": "Chain shirt",
+        "baseAC": 13,
+        "stealthDis": false,
+        "cost": 50,
+        "weight": 20,
+        "mod": "dex",
+        "modMax": 2
+      },
+      {
+        "name": "Scale mail",
+        "baseAC": 14,
+        "stealthDis": true,
+        "cost": 50,
+        "weight": 45,
+        "mod": "dex",
+        "modMax": 2
+      },
+      {
+        "name": "Breastplate",
+        "baseAC": 14,
+        "stealthDis": false,
+        "cost": 400,
+        "weight": 20,
+        "mod": "dex",
+        "modMax": 2
+      },
+      {
+        "name": "Half plate",
+        "baseAC": 15,
+        "stealthDis": true,
+        "cost": 750,
+        "weight": 40,
+        "mod": "dex",
+        "modMax": 2
+      }
+    ],
+    "heavy": [{
+        "name": "Ring mail",
+        "baseAC": 14,
+        "stealthDis": true,
+        "cost": 30,
+        "weight": 40,
+        "mod": "",
+        "modMax": 0
+      },
+      {
+        "name": "Chain mail",
+        "baseAC": 16,
+        "stealthDis": true,
+        "cost": 75,
+        "weight": 55,
+        "mod": "",
+        "modMax": 0
+      },
+      {
+        "name": "Splint",
+        "baseAC": 17,
+        "stealthDis": true,
+        "cost": 200,
+        "weight": 60,
+        "mod": "",
+        "modMax": 0
+      },
+      {
+        "name": "Plate",
+        "baseAC": 18,
+        "stealthDis": true,
+        "cost": 1500,
+        "weight": 65,
+        "mod": "",
+        "modMax": 0
+      }
+    ]
+  },
+  "shield": {
+    "name": "Shield",
+    "baseAC": 2,
+    "stealthDis": false,
+    "cost": 10,
+    "weight": 6,
+    "mod": "",
+    "modMax": 0
+  }
+
+}
