@@ -38,7 +38,7 @@
     "Dwarf": {
       "size": "Medium",
       "speed": 25,
-      "features": "Darkvision, Dwarven Resilience, Dwarven Combat Training(You have proficiency with the battleaxe, handaxe, light hammer, and warhammer.), Tool Proficiency(You gain proficiency with the artisan’s tools of your choice: smith’s tools, brewer’s supplies, or mason’s tools.), Stonecunning(Whenever you make an Intelligence check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus.)",
+      "features": ["Darkvision", " Dwarven Resilience", "Dwarven Combat Training(You have proficiency with the battleaxe, handaxe, light hammer, and warhammer.)", "Tool Proficiency(You gain proficiency with the artisan’s tools of your choice: smith’s tools, brewer’s supplies, or mason’s tools.)", "Stonecunning(Whenever you make an Intelligence check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus.)"],
       "languages": "Common Dwarvish",
       "strength": 0,
       "dextrerity": 0,
