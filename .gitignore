@@ -4,4 +4,4 @@
 **/.vscode
 **/elm-stuff
 test.html
-**/?venv
+*venv
