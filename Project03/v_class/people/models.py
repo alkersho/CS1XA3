@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from classes.models import Class
 
 
 class PersonManager(models.Manager):
@@ -23,7 +22,7 @@ class Person(models.Model):
     user_type = models.CharField(max_length=20, choices=PERSON_TYPES)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    classes = models.ManyToManyField(Class)
+    classes = models.ManyToManyField('classes.Class')
     dob = models.DateField(null=True)
     gender = models.CharField(max_length=20,
                               choices=[('M', 'Male'), ('F', 'Female')],

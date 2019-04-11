@@ -1,5 +1,4 @@
 from django.db import models
-from people.models import Person
 
 
 class Class(models.Model):
@@ -15,8 +14,10 @@ class Class(models.Model):
 class Announcement(models.Model):
     title = models.CharField(max_length=100)
     body = models.CharField(max_length=500)
-    owner = models.ForeignKey(Person, on_delete=models.SET_NULL)
-    cl = models.ForeignKey(Class, on_delete=models.CASCADE)
+    owner = models.ForeignKey('people.Person',
+                              on_delete=models.SET_NULL,
+                              null=True)
+    cl = models.ForeignKey('classes.Class', on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
