@@ -15,6 +15,7 @@ import Bootstrap.Alert as Alert
 import Json.Encode as Encode
 import Json.Decode as Decode
 import Browser
+import Browser.Navigation as Nav
 
 main = Browser.element { init = init,
                          view = view,
@@ -58,7 +59,7 @@ type Msg = FirstName String
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ( { nameFirst = "", nameLast = "", email = "", emailError = "", dob = "", dobError = "", password = "", passwordError = "", passwordAgain = "", passwordAgainError = "", userName = "", userNameError = "", gender = "", error_response = "test1" }, Cmd.none )
+    ( { nameFirst = "", nameLast = "", email = "", emailError = "", dob = "", dobError = "", password = "", passwordError = "", passwordAgain = "", passwordAgainError = "", userName = "", userNameError = "", gender = "", error_response = "" }, Cmd.none )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -99,7 +100,7 @@ update msg model =
           Ok val ->
             if val == "" then
               -- go to homepage
-              ({model | error_response = "Success"}, Cmd.none)
+              ({model | error_response = "Success2"}, Nav.load "/class/")
             else
               ({model | error_response = val}, Cmd.none)
           Err val ->
@@ -109,7 +110,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Grid.container [] [
-      Alert.simpleDanger [] [text model.error_response],
+      errorMsg model,
       F.form [] [
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "First Name:"],
@@ -133,8 +134,9 @@ view model =
           F.colLabel [Col.sm2] [text "Gender:"],
           F.col [Col.sm10] [
             Select.select [Select.onChange Gender, Select.attrs [style "max-width" "200px"]] [
+              Select.item [] [text "Select..."],
               Select.item [value "M"] [text "Male"],
-              Select.item [] [text "Female"]
+              Select.item [value "F"] [text "Female"]
             ]
           ]
         ],
@@ -244,6 +246,9 @@ sendData model =
 
 errorMsg : Model -> Html Msg
 errorMsg model =
+  if model.error_response == "" then
+      div [] []
+  else
       div [] [Alert.simpleDanger [] [text model.error_response]]
 
 modelEncode : Model -> Encode.Value
