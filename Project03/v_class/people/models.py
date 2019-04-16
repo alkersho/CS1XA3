@@ -1,25 +1,34 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime
 
 
 class PersonManager(models.Manager):
     def create_person(self, username, password, **kwargs):
-        user = User.objects.create_user(username=User, password=password)
+        # username = kwargs['last_name'] + kwargs['first_name'][0]
+        user = User.objects.create_user(username=username,
+                                        password=password,
+                                        email=kwargs['email'])
+        date = datetime.strptime(kwargs['dob'], '%Y-%m-%d')
         person = self.create(user=user,
-                             user_type=kwargs['user_type'],
+                             user_type='STD',
                              first_name=kwargs['first_name'],
-                             last_name=kwargs['last_name'])
+                             last_name=kwargs['last_name'],
+                             dob=date,
+                             gender=kwargs['gender'])
         return person
 
 
 class Person(models.Model):
     PERSON_TYPES = [
         ("TCHR", "Teacher"),
-        ("STD", "Student"),
+        ("STD", "Student"),  # best abbreviaiton accident ever
         ("ADM", "Admin")
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    user_type = models.CharField(max_length=20, choices=PERSON_TYPES)
+    user_type = models.CharField(max_length=20,
+                                 choices=PERSON_TYPES,
+                                 default='STD')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     classes = models.ManyToManyField('classes.Class')
