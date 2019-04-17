@@ -7,6 +7,7 @@ import Http
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
+import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Form as F
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.Select as Select
@@ -28,16 +29,17 @@ type alias Model = {
   nameFirst : String,
   nameLast : String,
   email : String,
-  emailError : String,
+  emailError : List String,
   dob : String,
-  dobError : String,
+  dobError : List String,
   password : String,
-  passwordError : String,
+  passwordError : List String,
   passwordAgain : String,
-  passwordAgainError : String,
+  passwordAgainError : List String,
   userName : String,
-  userNameError : String,
+  userNameError : List String,
   gender : String,
+  genderError : List String,
   error_response : String
   }
 
@@ -45,21 +47,16 @@ type Msg = FirstName String
          | LastName String
          | Gender String
          | Email String
-         | ValEmail
          | Dob String
-         | ValDob
          | Password String
-         | ValPassword
          | PasswordAgain String
-         | ValPasswordAgain
          | UserName String
-         | ValUserName
          | Create
          | PostResponse (Result Http.Error String)
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ( { nameFirst = "", nameLast = "", email = "", emailError = "", dob = "", dobError = "", password = "", passwordError = "", passwordAgain = "", passwordAgainError = "", userName = "", userNameError = "", gender = "", error_response = "" }, Cmd.none )
+    ( { nameFirst = "", nameLast = "", email = "", emailError = [], dob = "", dobError = [], password = "", passwordError = [], passwordAgain = "", passwordAgainError = [], userName = "", userNameError = [], gender = "", genderError = [], error_response = "" }, Cmd.none )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -71,25 +68,15 @@ update msg model =
       Gender string ->
         ({model | gender = string}, Cmd.none)
       Email string ->
-        ({model | email = string}, Cmd.none)
-      ValEmail ->
-        (model, Cmd.none)
+        (emailValidate {model | email = string}, Cmd.none)
       Dob string ->
-        ({model | dob = string}, Cmd.none)
-      ValDob ->
-        (model, Cmd.none)
+        (dobValidate {model | dob = string}, Cmd.none)
       Password string ->
-        ({model | password = string}, Cmd.none)
-      ValPassword ->
-        (model, Cmd.none)
+        (passValidate {model | password = string}, Cmd.none)
       PasswordAgain string ->
-        ({model | passwordAgain = string}, Cmd.none)
-      ValPasswordAgain ->
-        (model, Cmd.none)
+        (passAgainValidate {model | passwordAgain = string}, Cmd.none)
       UserName string ->
-        ({model | userName = string}, Cmd.none)
-      ValUserName ->
-        (model, Cmd.none)
+        (userNameValidate {model | userName = string}, Cmd.none)
       Create ->
         if model.password == model.passwordAgain then
           (model, sendData model)
@@ -105,7 +92,6 @@ update msg model =
               ({model | error_response = val}, Cmd.none)
           Err val ->
             (handleError model val, Cmd.none)
-
 
 view : Model -> Html Msg
 view model =
@@ -127,7 +113,8 @@ view model =
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "User Name:"],
           F.col [ Col.sm10 ] [
-            Input.text [Input.attrs [style "max-width" "200px"], Input.onInput UserName]
+            Input.text [Input.attrs [style "max-width" "200px"], Input.onInput UserName],
+            userNameError model
           ]
         ],
         F.row [] [
@@ -137,31 +124,36 @@ view model =
               Select.item [] [text "Select..."],
               Select.item [value "M"] [text "Male"],
               Select.item [value "F"] [text "Female"]
-            ]
+            ],
+            genderError model
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Email:"],
           F.col [ Col.sm10 ] [
-            Input.email [Input.attrs [style "max-width" "200px"], Input.onInput Email]
+            Input.email [Input.attrs [style "max-width" "200px"], Input.onInput Email],
+            emailError model
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Date of Birth:"],
           F.col [ Col.sm10 ] [
-            Input.date [Input.attrs [style "max-width" "200px"], Input.onInput Dob]
+            Input.date [Input.attrs [style "max-width" "200px"], Input.onInput Dob],
+            dobError model
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Password:"],
           F.col [ Col.sm10 ] [
-            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput Password]
+            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput Password],
+            passError model
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Password Again:"],
           F.col [ Col.sm10 ] [
-            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput PasswordAgain]
+            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput PasswordAgain],
+            passAgainError model
           ]
         ],
         Button.button [Button.primary, Button.onClick Create] [text "Submit"]
@@ -263,7 +255,6 @@ modelEncode model =
         ("gender" , Encode.string model.gender)
       ]
 
-
 handleError : Model -> Http.Error -> Model
 handleError model error =
     case error of
@@ -281,3 +272,132 @@ handleError model error =
 
         Http.BadBody body ->
             { model | error_response = "bad body " ++ body }
+
+passValidate : Model -> Model
+passValidate model =
+    let
+      -- add validation methods that add errors to list
+        errorMsgs = []
+    in
+        {model | passwordError = errorMsgs}
+
+passAgainValidate : Model -> Model
+passAgainValidate model =
+    if model.password == model.passwordAgain then
+        model
+    else
+        {model | passwordAgainError = ["Passwords Do Not Match!"]}
+
+emailValidate : Model -> Model
+emailValidate model =
+    let
+      -- add validation methods that add errors to list
+        errorMsgs = []
+    in
+        {model | emailError = errorMsgs}
+
+dobValidate : Model -> Model
+dobValidate model =
+    let
+      -- add validation methods that add errors to list
+        errorMsgs = []
+    in
+        {model | dobError = errorMsgs}
+
+userNameValidate : Model -> Model
+userNameValidate model =
+    let
+      -- add validation methods that add errors to list
+        errorMsgs = []
+    in
+        {model | userNameError = errorMsgs}
+
+passError : Model -> Html Msg
+passError model =
+    let
+        errorLists : List String -> List (ListGroup.Item Msg)
+        errorLists errors =
+          case errors of
+            [] ->
+              []
+            x::xs ->
+              ListGroup.li [] [text x] :: errorLists xs
+    in if model.passwordError == [] then
+        div [] []
+    else
+        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.passwordError]]
+
+passAgainError : Model -> Html Msg
+passAgainError model =
+    let
+        errorLists : List String -> List (ListGroup.Item Msg)
+        errorLists errors =
+          case errors of
+            [] ->
+              []
+            x::xs ->
+              ListGroup.li [] [text x] :: errorLists xs
+    in if model.passwordAgainError == [] then
+        div [] []
+    else
+        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.passwordAgainError]]
+
+userNameError : Model -> Html Msg
+userNameError model =
+    let
+        errorLists : List String -> List (ListGroup.Item Msg)
+        errorLists errors =
+          case errors of
+            [] ->
+              []
+            x::xs ->
+              ListGroup.li [] [text x] :: errorLists xs
+    in if model.userNameError == [] then
+        div [] []
+    else
+        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.userNameError]]
+
+emailError : Model -> Html Msg
+emailError model =
+    let
+        errorLists : List String -> List (ListGroup.Item Msg)
+        errorLists errors =
+          case errors of
+            [] ->
+              []
+            x::xs ->
+              ListGroup.li [] [text x] :: errorLists xs
+    in if model.emailError == [] then
+        div [] []
+    else
+        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.emailError]]
+
+dobError : Model -> Html Msg
+dobError model =
+    let
+        errorLists : List String -> List (ListGroup.Item Msg)
+        errorLists errors =
+          case errors of
+            [] ->
+              []
+            x::xs ->
+              ListGroup.li [] [text x] :: errorLists xs
+    in if model.dobError == [] then
+        div [] []
+    else
+        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.dobError]]
+
+genderError : Model -> Html Msg
+genderError model =
+    let
+        errorLists : List String -> List (ListGroup.Item Msg)
+        errorLists errors =
+          case errors of
+            [] ->
+              []
+            x::xs ->
+              ListGroup.li [] [text x] :: errorLists xs
+    in if model.genderError == [] then
+        div [] []
+    else
+        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.genderError]]
