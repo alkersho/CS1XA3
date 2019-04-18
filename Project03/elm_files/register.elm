@@ -17,6 +17,8 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import Browser
 import Browser.Navigation as Nav
+-- import Time exposing (Time)
+-- import Task
 
 main = Browser.element { init = init,
                          view = view,
@@ -35,8 +37,6 @@ type alias Model = {
   passwordError : List String,
   passwordAgain : String,
   passwordAgainError : List String,
-  userName : String,
-  userNameError : List String,
   gender : String,
   genderError : List String,
   error_response : String
@@ -49,13 +49,12 @@ type Msg = FirstName String
          | Dob String
          | Password String
          | PasswordAgain String
-         | UserName String
          | Create
          | PostResponse (Result Http.Error String)
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ( { nameFirst = "", nameLast = "", email = "", emailError = [], dob = "", dobError = [], password = "", passwordError = [], passwordAgain = "", passwordAgainError = [], userName = "", userNameError = [], gender = "", genderError = [], error_response = "" }, Cmd.none )
+    ( { nameFirst = "", nameLast = "", email = "", emailError = [], dob = "", dobError = [], password = "", passwordError = [], passwordAgain = "", passwordAgainError = [], gender = "", genderError = [], error_response = "" }, Cmd.none )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -71,11 +70,9 @@ update msg model =
       Dob string ->
         (dobValidate {model | dob = string}, Cmd.none)
       Password string ->
-        (passValidate {model | password = string}, Cmd.none)
+        (passAgainValidate <| passValidate {model | password = string}, Cmd.none)
       PasswordAgain string ->
         (passAgainValidate {model | passwordAgain = string}, Cmd.none)
-      UserName string ->
-        (userNameValidate {model | userName = string}, Cmd.none)
       Create ->
         if model.password == model.passwordAgain then
           (model, sendData model)
@@ -100,20 +97,13 @@ view model =
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "First Name:"],
           F.col [ Col.sm10 ] [
-            Input.text [Input.attrs [style "max-width" "200px"], Input.onInput FirstName]
+            Input.text [Input.attrs [style "max-width" "200px", required True], Input.onInput FirstName]
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Last Name:"],
           F.col [ Col.sm10 ] [
             Input.text [Input.attrs [style "max-width" "200px"], Input.onInput LastName]
-          ]
-        ],
-        F.row [] [
-          F.colLabel [ Col.sm2 ] [text "User Name:"],
-          F.col [ Col.sm10 ] [
-            Input.text [Input.attrs [style "max-width" "200px"], Input.onInput UserName],
-            userNameError model
           ]
         ],
         F.row [] [
@@ -130,28 +120,28 @@ view model =
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Email:"],
           F.col [ Col.sm10 ] [
-            Input.email [Input.attrs [style "max-width" "200px"], Input.onInput Email],
+            Input.email [Input.attrs [style "max-width" "200px"], Input.onInput Email, emailValidHtml model],
             emailError model
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Date of Birth:"],
           F.col [ Col.sm10 ] [
-            Input.date [Input.attrs [style "max-width" "200px"], Input.onInput Dob],
+            Input.date [Input.attrs [style "max-width" "200px"], Input.onInput Dob, dobValidHtml model],
             dobError model
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Password:"],
           F.col [ Col.sm10 ] [
-            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput Password],
+            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput Password, passValidHtml model],
             passError model
           ]
         ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "Password Again:"],
           F.col [ Col.sm10 ] [
-            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput PasswordAgain],
+            Input.password [Input.attrs [style "max-width" "200px"], Input.onInput PasswordAgain, passAgainValidHtml model],
             passAgainError model
           ]
         ],
@@ -246,13 +236,12 @@ errorMsg model =
 modelEncode : Model -> Encode.Value
 modelEncode model =
     Encode.object [
-        ("fName", Encode.string model.nameFirst),
-        ("lName", Encode.string model.nameLast),
-        ("usrnm", Encode.string model.userName),
-        ("password", Encode.string model.password),
-        ("email", Encode.string model.email),
-        ("dob", Encode.string model.dob),
-        ("gender" , Encode.string model.gender)
+        ("First Name", Encode.string model.nameFirst),
+        ("Last Name", Encode.string model.nameLast),
+        ("Password", Encode.string model.password),
+        ("Email", Encode.string model.email),
+        ("Date of Birth", Encode.string model.dob),
+        ("Gender" , Encode.string model.gender)
       ]
 
 handleError : Model -> Http.Error -> Model
@@ -277,15 +266,18 @@ handleError model error =
 passValidate : Model -> Model
 passValidate model =
     let
-      -- add validation methods that add errors to list
-        errorMsgs = []
+        lengthError =
+          if String.length model.password < 10 then
+            ["Password is too short, atleast 10 chatacters"]
+          else
+            []
     in
-        {model | passwordError = errorMsgs}
+        {model | passwordError = lengthError}
 
 passAgainValidate : Model -> Model
 passAgainValidate model =
     if model.password == model.passwordAgain then
-        model
+        {model | passwordAgainError = []}
     else
         {model | passwordAgainError = ["Passwords Do Not Match!"]}
 
@@ -305,14 +297,6 @@ dobValidate model =
     in
         {model | dobError = errorMsgs}
 
-userNameValidate : Model -> Model
-userNameValidate model =
-    let
-      -- add validation methods that add errors to list
-        errorMsgs = []
-    in
-        {model | userNameError = errorMsgs}
-
 -- error viewing functions
 passError : Model -> Html Msg
 passError model =
@@ -323,11 +307,11 @@ passError model =
             [] ->
               []
             x::xs ->
-              ListGroup.li [] [text x] :: errorLists xs
+              ListGroup.li [ListGroup.danger] [text x] :: errorLists xs
     in if model.passwordError == [] then
         div [] []
     else
-        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.passwordError]]
+        div [] [ListGroup.ul <| errorLists model.passwordError]
 
 passAgainError : Model -> Html Msg
 passAgainError model =
@@ -338,26 +322,11 @@ passAgainError model =
             [] ->
               []
             x::xs ->
-              ListGroup.li [] [text x] :: errorLists xs
+              ListGroup.li [ListGroup.danger] [text x] :: errorLists xs
     in if model.passwordAgainError == [] then
         div [] []
     else
-        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.passwordAgainError]]
-
-userNameError : Model -> Html Msg
-userNameError model =
-    let
-        errorLists : List String -> List (ListGroup.Item Msg)
-        errorLists errors =
-          case errors of
-            [] ->
-              []
-            x::xs ->
-              ListGroup.li [] [text x] :: errorLists xs
-    in if model.userNameError == [] then
-        div [] []
-    else
-        div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.userNameError]]
+        div [] [ListGroup.ul <| errorLists model.passwordAgainError]
 
 emailError : Model -> Html Msg
 emailError model =
@@ -403,3 +372,40 @@ genderError model =
         div [] []
     else
         div [] [Alert.simpleDanger [] [ListGroup.ul <| errorLists model.genderError]]
+
+--html input valide
+
+passValidHtml : Model -> Input.Option Msg
+passValidHtml model =
+    if model.passwordError == [] then
+        Input.attrs []
+    else
+        Input.danger
+
+passAgainValidHtml : Model -> Input.Option Msg
+passAgainValidHtml model =
+    if model.passwordAgainError == [] then
+        Input.attrs []
+    else
+        Input.danger
+
+emailValidHtml : Model -> Input.Option Msg
+emailValidHtml model =
+    if model.emailError == [] then
+        Input.attrs []
+    else
+        Input.danger
+
+dobValidHtml : Model -> Input.Option Msg
+dobValidHtml model =
+    if model.dobError == [] then
+        Input.attrs []
+    else
+        Input.danger
+
+genderValidHtml : Model -> Input.Option Msg
+genderValidHtml model =
+    if model.genderError == [] then
+        Input.attrs []
+    else
+        Input.danger

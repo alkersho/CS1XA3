@@ -14,12 +14,20 @@ def login(request):
 def register(request):
     if request.body:
         post = json.loads(request.body)
-        Person.objects.create_person(username=post['usrnm'],
-                                     password=post['password'],
-                                     first_name=post['fName'],
-                                     last_name=post['lName'],
-                                     email=post['email'],
-                                     dob=post['dob'],
-                                     gender=post['gender'])
+        try:
+            Person.objects.create_person(password=post['Password'],
+                                         first_name=post['First Name'],
+                                         last_name=post['Last Name'],
+                                         email=post['Email'],
+                                         dob=post['Date of Birth'],
+                                         gender=post['Gender'])
+        except Exception:
+            empty_fields = []
+            values = list(post.values())
+            keys = list(post.keys())
+            for i in range(len(post)):
+                if values[i] == "":
+                    empty_fields.append(keys[i])
+            return HttpResponse("Fields are Empty: " + ', '.join(empty_fields))
         return HttpResponse("")
     return HttpResponse("Body is Empty")

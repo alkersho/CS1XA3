@@ -4964,8 +4964,20 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Register$init = function (_n0) {
 	return _Utils_Tuple2(
-		{dob: '', dobError: '', email: '', emailError: '', error_response: '', gender: '', nameFirst: '', nameLast: '', password: '', passwordAgain: '', passwordAgainError: '', passwordError: '', userName: '', userNameError: ''},
+		{dob: '', dobError: _List_Nil, email: '', emailError: _List_Nil, error_response: '', gender: '', genderError: _List_Nil, nameFirst: '', nameLast: '', password: '', passwordAgain: '', passwordAgainError: _List_Nil, passwordError: _List_Nil},
 		elm$core$Platform$Cmd$none);
+};
+var author$project$Register$dobValidate = function (model) {
+	var errorMsgs = _List_Nil;
+	return _Utils_update(
+		model,
+		{dobError: errorMsgs});
+};
+var author$project$Register$emailValidate = function (model) {
+	var errorMsgs = _List_Nil;
+	return _Utils_update(
+		model,
+		{emailError: errorMsgs});
 };
 var author$project$Register$handleError = F2(
 	function (model, error) {
@@ -4997,6 +5009,24 @@ var author$project$Register$handleError = F2(
 					{error_response: 'bad body ' + body});
 		}
 	});
+var author$project$Register$passAgainValidate = function (model) {
+	return _Utils_eq(model.password, model.passwordAgain) ? _Utils_update(
+		model,
+		{passwordAgainError: _List_Nil}) : _Utils_update(
+		model,
+		{
+			passwordAgainError: _List_fromArray(
+				['Passwords Do Not Match!'])
+		});
+};
+var elm$core$String$length = _String_length;
+var author$project$Register$passValidate = function (model) {
+	var lengthError = (elm$core$String$length(model.password) < 10) ? _List_fromArray(
+		['Password is too short, atleast 10 chatacters']) : _List_Nil;
+	return _Utils_update(
+		model,
+		{passwordError: lengthError});
+};
 var author$project$Register$PostResponse = function (a) {
 	return {$: 'PostResponse', a: a};
 };
@@ -5019,25 +5049,22 @@ var author$project$Register$modelEncode = function (model) {
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				'fName',
+				'First Name',
 				elm$json$Json$Encode$string(model.nameFirst)),
 				_Utils_Tuple2(
-				'lName',
+				'Last Name',
 				elm$json$Json$Encode$string(model.nameLast)),
 				_Utils_Tuple2(
-				'usrnm',
-				elm$json$Json$Encode$string(model.userName)),
-				_Utils_Tuple2(
-				'password',
+				'Password',
 				elm$json$Json$Encode$string(model.password)),
 				_Utils_Tuple2(
-				'email',
+				'Email',
 				elm$json$Json$Encode$string(model.email)),
 				_Utils_Tuple2(
-				'dob',
+				'Date of Birth',
 				elm$json$Json$Encode$string(model.dob)),
 				_Utils_Tuple2(
-				'gender',
+				'Gender',
 				elm$json$Json$Encode$string(model.gender))
 			]));
 };
@@ -6029,7 +6056,6 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var elm$core$String$length = _String_length;
 var elm$core$String$slice = _String_slice;
 var elm$core$String$dropLeft = F2(
 	function (n, string) {
@@ -6186,48 +6212,36 @@ var author$project$Register$update = F2(
 			case 'Email':
 				var string = msg.a;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{email: string}),
+					author$project$Register$emailValidate(
+						_Utils_update(
+							model,
+							{email: string})),
 					elm$core$Platform$Cmd$none);
-			case 'ValEmail':
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			case 'Dob':
 				var string = msg.a;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dob: string}),
+					author$project$Register$dobValidate(
+						_Utils_update(
+							model,
+							{dob: string})),
 					elm$core$Platform$Cmd$none);
-			case 'ValDob':
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			case 'Password':
 				var string = msg.a;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{password: string}),
+					author$project$Register$passAgainValidate(
+						author$project$Register$passValidate(
+							_Utils_update(
+								model,
+								{password: string}))),
 					elm$core$Platform$Cmd$none);
-			case 'ValPassword':
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			case 'PasswordAgain':
 				var string = msg.a;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{passwordAgain: string}),
+					author$project$Register$passAgainValidate(
+						_Utils_update(
+							model,
+							{passwordAgain: string})),
 					elm$core$Platform$Cmd$none);
-			case 'ValPasswordAgain':
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-			case 'UserName':
-				var string = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{userName: string}),
-					elm$core$Platform$Cmd$none);
-			case 'ValUserName':
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			case 'Create':
 				return _Utils_eq(model.password, model.passwordAgain) ? _Utils_Tuple2(
 					model,
@@ -6278,9 +6292,6 @@ var author$project$Register$Password = function (a) {
 };
 var author$project$Register$PasswordAgain = function (a) {
 	return {$: 'PasswordAgain', a: a};
-};
-var author$project$Register$UserName = function (a) {
-	return {$: 'UserName', a: a};
 };
 var elm$html$Html$div = _VirtualDom_node('div');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -6555,6 +6566,213 @@ var rundis$elm_bootstrap$Bootstrap$Alert$simple = F3(
 	});
 var rundis$elm_bootstrap$Bootstrap$Internal$Role$Danger = {$: 'Danger'};
 var rundis$elm_bootstrap$Bootstrap$Alert$simpleDanger = rundis$elm_bootstrap$Bootstrap$Alert$simple(rundis$elm_bootstrap$Bootstrap$Internal$Role$Danger);
+var elm$html$Html$li = _VirtualDom_node('li');
+var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$Item = function (a) {
+	return {$: 'Item', a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$ListGroup$li = F2(
+	function (options, children) {
+		return rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$Item(
+			{children: children, itemFn: elm$html$Html$li, options: options});
+	});
+var elm$html$Html$ul = _VirtualDom_node('ul');
+var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$applyModifier = F2(
+	function (modifier, options) {
+		switch (modifier.$) {
+			case 'Roled':
+				var role = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						role: elm$core$Maybe$Just(role)
+					});
+			case 'Action':
+				return _Utils_update(
+					options,
+					{action: true});
+			case 'Disabled':
+				return _Utils_update(
+					options,
+					{disabled: true});
+			case 'Active':
+				return _Utils_update(
+					options,
+					{active: true});
+			default:
+				var attrs = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						attributes: _Utils_ap(options.attributes, attrs)
+					});
+		}
+	});
+var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$defaultOptions = {action: false, active: false, attributes: _List_Nil, disabled: false, role: elm$core$Maybe$Nothing};
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var elm$json$Json$Encode$bool = _Json_wrap;
+var elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var elm$html$Html$Attributes$disabled = elm$html$Html$Attributes$boolProperty('disabled');
+var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$itemAttributes = function (options) {
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('list-group-item', true),
+						_Utils_Tuple2('disabled', options.disabled),
+						_Utils_Tuple2('active', options.active),
+						_Utils_Tuple2('list-group-item-action', options.action)
+					]))
+			]),
+		_Utils_ap(
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$disabled(options.disabled)
+				]),
+			_Utils_ap(
+				A2(
+					elm$core$Maybe$withDefault,
+					_List_Nil,
+					A2(
+						elm$core$Maybe$map,
+						function (r) {
+							return _List_fromArray(
+								[
+									A2(rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass, 'list-group-item', r)
+								]);
+						},
+						options.role)),
+				options.attributes)));
+};
+var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$renderItem = function (_n0) {
+	var itemFn = _n0.a.itemFn;
+	var options = _n0.a.options;
+	var children = _n0.a.children;
+	return A2(
+		itemFn,
+		rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$itemAttributes(
+			A3(elm$core$List$foldl, rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$applyModifier, rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$defaultOptions, options)),
+		children);
+};
+var rundis$elm_bootstrap$Bootstrap$ListGroup$ul = function (items) {
+	return A2(
+		elm$html$Html$ul,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('list-group')
+			]),
+		A2(elm$core$List$map, rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$renderItem, items));
+};
+var author$project$Register$dobError = function (model) {
+	var errorLists = function (errors) {
+		if (!errors.b) {
+			return _List_Nil;
+		} else {
+			var x = errors.a;
+			var xs = errors.b;
+			return A2(
+				elm$core$List$cons,
+				A2(
+					rundis$elm_bootstrap$Bootstrap$ListGroup$li,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text(x)
+						])),
+				errorLists(xs));
+		}
+	};
+	return _Utils_eq(model.dobError, _List_Nil) ? A2(elm$html$Html$div, _List_Nil, _List_Nil) : A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Alert$simpleDanger,
+				_List_Nil,
+				_List_fromArray(
+					[
+						rundis$elm_bootstrap$Bootstrap$ListGroup$ul(
+						errorLists(model.dobError))
+					]))
+			]));
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Attrs = function (a) {
+	return {$: 'Attrs', a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$attrs = function (attrs_) {
+	return rundis$elm_bootstrap$Bootstrap$Form$Input$Attrs(attrs_);
+};
+var rundis$elm_bootstrap$Bootstrap$Form$FormInternal$Danger = {$: 'Danger'};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$Validation = function (a) {
+	return {$: 'Validation', a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Input$danger = rundis$elm_bootstrap$Bootstrap$Form$Input$Validation(rundis$elm_bootstrap$Bootstrap$Form$FormInternal$Danger);
+var author$project$Register$dobValidHtml = function (model) {
+	return _Utils_eq(model.dobError, _List_Nil) ? rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : rundis$elm_bootstrap$Bootstrap$Form$Input$danger;
+};
+var author$project$Register$emailError = function (model) {
+	var errorLists = function (errors) {
+		if (!errors.b) {
+			return _List_Nil;
+		} else {
+			var x = errors.a;
+			var xs = errors.b;
+			return A2(
+				elm$core$List$cons,
+				A2(
+					rundis$elm_bootstrap$Bootstrap$ListGroup$li,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text(x)
+						])),
+				errorLists(xs));
+		}
+	};
+	return _Utils_eq(model.emailError, _List_Nil) ? A2(elm$html$Html$div, _List_Nil, _List_Nil) : A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Alert$simpleDanger,
+				_List_Nil,
+				_List_fromArray(
+					[
+						rundis$elm_bootstrap$Bootstrap$ListGroup$ul(
+						errorLists(model.emailError))
+					]))
+			]));
+};
+var author$project$Register$emailValidHtml = function (model) {
+	return _Utils_eq(model.emailError, _List_Nil) ? rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : rundis$elm_bootstrap$Bootstrap$Form$Input$danger;
+};
 var author$project$Register$errorMsg = function (model) {
 	return (model.error_response === '') ? A2(elm$html$Html$div, _List_Nil, _List_Nil) : A2(
 		elm$html$Html$div,
@@ -6570,6 +6788,109 @@ var author$project$Register$errorMsg = function (model) {
 					]))
 			]));
 };
+var author$project$Register$genderError = function (model) {
+	var errorLists = function (errors) {
+		if (!errors.b) {
+			return _List_Nil;
+		} else {
+			var x = errors.a;
+			var xs = errors.b;
+			return A2(
+				elm$core$List$cons,
+				A2(
+					rundis$elm_bootstrap$Bootstrap$ListGroup$li,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text(x)
+						])),
+				errorLists(xs));
+		}
+	};
+	return _Utils_eq(model.genderError, _List_Nil) ? A2(elm$html$Html$div, _List_Nil, _List_Nil) : A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Alert$simpleDanger,
+				_List_Nil,
+				_List_fromArray(
+					[
+						rundis$elm_bootstrap$Bootstrap$ListGroup$ul(
+						errorLists(model.genderError))
+					]))
+			]));
+};
+var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$Roled = function (a) {
+	return {$: 'Roled', a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$ListGroup$danger = rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$Roled(rundis$elm_bootstrap$Bootstrap$Internal$Role$Danger);
+var author$project$Register$passAgainError = function (model) {
+	var errorLists = function (errors) {
+		if (!errors.b) {
+			return _List_Nil;
+		} else {
+			var x = errors.a;
+			var xs = errors.b;
+			return A2(
+				elm$core$List$cons,
+				A2(
+					rundis$elm_bootstrap$Bootstrap$ListGroup$li,
+					_List_fromArray(
+						[rundis$elm_bootstrap$Bootstrap$ListGroup$danger]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(x)
+						])),
+				errorLists(xs));
+		}
+	};
+	return _Utils_eq(model.passwordAgainError, _List_Nil) ? A2(elm$html$Html$div, _List_Nil, _List_Nil) : A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				rundis$elm_bootstrap$Bootstrap$ListGroup$ul(
+				errorLists(model.passwordAgainError))
+			]));
+};
+var author$project$Register$passAgainValidHtml = function (model) {
+	return _Utils_eq(model.passwordAgainError, _List_Nil) ? rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : rundis$elm_bootstrap$Bootstrap$Form$Input$danger;
+};
+var author$project$Register$passError = function (model) {
+	var errorLists = function (errors) {
+		if (!errors.b) {
+			return _List_Nil;
+		} else {
+			var x = errors.a;
+			var xs = errors.b;
+			return A2(
+				elm$core$List$cons,
+				A2(
+					rundis$elm_bootstrap$Bootstrap$ListGroup$li,
+					_List_fromArray(
+						[rundis$elm_bootstrap$Bootstrap$ListGroup$danger]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(x)
+						])),
+				errorLists(xs));
+		}
+	};
+	return _Utils_eq(model.passwordError, _List_Nil) ? A2(elm$html$Html$div, _List_Nil, _List_Nil) : A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				rundis$elm_bootstrap$Bootstrap$ListGroup$ul(
+				errorLists(model.passwordError))
+			]));
+};
+var author$project$Register$passValidHtml = function (model) {
+	return _Utils_eq(model.passwordError, _List_Nil) ? rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(_List_Nil) : rundis$elm_bootstrap$Bootstrap$Form$Input$danger;
+};
+var elm$html$Html$Attributes$required = elm$html$Html$Attributes$boolProperty('required');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
@@ -6580,15 +6901,6 @@ var elm$core$Maybe$andThen = F2(
 			return elm$core$Maybe$Nothing;
 		}
 	});
-var elm$json$Json$Encode$bool = _Json_wrap;
-var elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$bool(bool));
-	});
-var elm$html$Html$Attributes$disabled = elm$html$Html$Attributes$boolProperty('disabled');
 var rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption = function (size) {
 	switch (size.$) {
 		case 'XS':
@@ -7049,25 +7361,6 @@ var rundis$elm_bootstrap$Bootstrap$Grid$Internal$applyColOption = F2(
 					{
 						textAlign: elm$core$Maybe$Just(align)
 					});
-		}
-	});
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
 		}
 	});
 var rundis$elm_bootstrap$Bootstrap$Grid$Internal$columnCountOption = function (size) {
@@ -7587,12 +7880,6 @@ var rundis$elm_bootstrap$Bootstrap$Form$row = F2(
 				rundis$elm_bootstrap$Bootstrap$Grid$Internal$rowAttributes(options)),
 			A2(elm$core$List$map, rundis$elm_bootstrap$Bootstrap$Form$renderCol, cols));
 	});
-var rundis$elm_bootstrap$Bootstrap$Form$Input$Attrs = function (a) {
-	return {$: 'Attrs', a: a};
-};
-var rundis$elm_bootstrap$Bootstrap$Form$Input$attrs = function (attrs_) {
-	return rundis$elm_bootstrap$Bootstrap$Form$Input$Attrs(attrs_);
-};
 var rundis$elm_bootstrap$Bootstrap$Form$Input$Date = {$: 'Date'};
 var rundis$elm_bootstrap$Bootstrap$Form$Input$Input = function (a) {
 	return {$: 'Input', a: a};
@@ -8031,7 +8318,8 @@ var author$project$Register$view = function (model) {
 												rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(
 												_List_fromArray(
 													[
-														A2(elm$html$Html$Attributes$style, 'max-width', '200px')
+														A2(elm$html$Html$Attributes$style, 'max-width', '200px'),
+														elm$html$Html$Attributes$required(true)
 													])),
 												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$FirstName)
 											]))
@@ -8065,37 +8353,6 @@ var author$project$Register$view = function (model) {
 														A2(elm$html$Html$Attributes$style, 'max-width', '200px')
 													])),
 												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$LastName)
-											]))
-									]))
-							])),
-						A2(
-						rundis$elm_bootstrap$Bootstrap$Form$row,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								rundis$elm_bootstrap$Bootstrap$Form$colLabel,
-								_List_fromArray(
-									[rundis$elm_bootstrap$Bootstrap$Grid$Col$sm2]),
-								_List_fromArray(
-									[
-										elm$html$Html$text('User Name:')
-									])),
-								A2(
-								rundis$elm_bootstrap$Bootstrap$Form$col,
-								_List_fromArray(
-									[rundis$elm_bootstrap$Bootstrap$Grid$Col$sm10]),
-								_List_fromArray(
-									[
-										rundis$elm_bootstrap$Bootstrap$Form$Input$text(
-										_List_fromArray(
-											[
-												rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(
-												_List_fromArray(
-													[
-														A2(elm$html$Html$Attributes$style, 'max-width', '200px')
-													])),
-												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$UserName)
 											]))
 									]))
 							])),
@@ -8158,7 +8415,8 @@ var author$project$Register$view = function (model) {
 													[
 														elm$html$Html$text('Female')
 													]))
-											]))
+											])),
+										author$project$Register$genderError(model)
 									]))
 							])),
 						A2(
@@ -8188,8 +8446,10 @@ var author$project$Register$view = function (model) {
 													[
 														A2(elm$html$Html$Attributes$style, 'max-width', '200px')
 													])),
-												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$Email)
-											]))
+												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$Email),
+												author$project$Register$emailValidHtml(model)
+											])),
+										author$project$Register$emailError(model)
 									]))
 							])),
 						A2(
@@ -8219,8 +8479,10 @@ var author$project$Register$view = function (model) {
 													[
 														A2(elm$html$Html$Attributes$style, 'max-width', '200px')
 													])),
-												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$Dob)
-											]))
+												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$Dob),
+												author$project$Register$dobValidHtml(model)
+											])),
+										author$project$Register$dobError(model)
 									]))
 							])),
 						A2(
@@ -8250,8 +8512,10 @@ var author$project$Register$view = function (model) {
 													[
 														A2(elm$html$Html$Attributes$style, 'max-width', '200px')
 													])),
-												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$Password)
-											]))
+												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$Password),
+												author$project$Register$passValidHtml(model)
+											])),
+										author$project$Register$passError(model)
 									]))
 							])),
 						A2(
@@ -8281,8 +8545,10 @@ var author$project$Register$view = function (model) {
 													[
 														A2(elm$html$Html$Attributes$style, 'max-width', '200px')
 													])),
-												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$PasswordAgain)
-											]))
+												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$PasswordAgain),
+												author$project$Register$passAgainValidHtml(model)
+											])),
+										author$project$Register$passAgainError(model)
 									]))
 							])),
 						A2(
