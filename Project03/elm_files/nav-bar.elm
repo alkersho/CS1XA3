@@ -90,14 +90,13 @@ view model =
 
 classesDropDown : List String -> List (Nav.DropdownItem Msg)
 classesDropDown classes =
-    if classes == [] then
+    case classes of
+      x::[] ->
+        [Nav.dropdownItem [href <| "/e/alkersho/class/" ++ x] [text x]]
+      x::xs ->
+        Nav.dropdownItem [ href <| "/e/alkersho/class/" ++ x] [text x] :: classesDropDown xs
+      [] ->
         [Nav.dropdownHeader [text "No Classes!"]]
-    else
-      case classes of
-        x::xs ->
-          Nav.dropdownItem [ href <| "/e/alkersho/class/" ++ x] [text x] :: classesDropDown xs
-        [] ->
-          []
 
 -- need implementation server side
 decodeClasses : Decode.Decoder (List String)

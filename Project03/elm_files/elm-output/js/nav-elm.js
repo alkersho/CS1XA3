@@ -6816,17 +6816,23 @@ var rundis$elm_bootstrap$Bootstrap$Navbar$dropdownItem = F2(
 				children));
 	});
 var author$project$NavBar$classesDropDown = function (classes) {
-	if (_Utils_eq(classes, _List_Nil)) {
-		return _List_fromArray(
-			[
-				rundis$elm_bootstrap$Bootstrap$Navbar$dropdownHeader(
-				_List_fromArray(
-					[
-						elm$html$Html$text('No Classes!')
-					]))
-			]);
-	} else {
-		if (classes.b) {
+	if (classes.b) {
+		if (!classes.b.b) {
+			var x = classes.a;
+			return _List_fromArray(
+				[
+					A2(
+					rundis$elm_bootstrap$Bootstrap$Navbar$dropdownItem,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$href('/e/alkersho/class/' + x)
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(x)
+						]))
+				]);
+		} else {
 			var x = classes.a;
 			var xs = classes.b;
 			return A2(
@@ -6842,9 +6848,16 @@ var author$project$NavBar$classesDropDown = function (classes) {
 							elm$html$Html$text(x)
 						])),
 				author$project$NavBar$classesDropDown(xs));
-		} else {
-			return _List_Nil;
 		}
+	} else {
+		return _List_fromArray(
+			[
+				rundis$elm_bootstrap$Bootstrap$Navbar$dropdownHeader(
+				_List_fromArray(
+					[
+						elm$html$Html$text('No Classes!')
+					]))
+			]);
 	}
 };
 var rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
