@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block content %}
 {% if type is "ADM" %}
 <div class="tab-content">
   <div id="home" class="tab-pane fade in active">
@@ -27,11 +28,23 @@
 </div>
 {% else %}
 <div id="account"></div>
-<script src="js/account-page.js"></script>
+<script src="{% static "js/account.js" %}"></script>
 <script type="text/javascript">
-  var account = document.getElementbyid("account");
+  var account = document.getElementById("account");
+  const flag = {
+    fName : "{{ fname }}",
+    lName : "{{ lname }}",
+    userType : "{{ typeDisplay }}",
+    userName : "{{ userName }}",
+    email : "{{ email }}",
+    gender : "{{ gender }}",
+    classes : {{ classes }},
+    dob : "{{ dob }}"
+  }
   const accountElm = Elm.Account.init({
-  node : account
+  node : account,
+  flags : flag
   });
 </script>
 {% endif %}
+{% endblock %}
