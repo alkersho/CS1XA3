@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% if type is "ADM" %}
+<div class="tab-content">
+  <div id="home" class="tab-pane fade in active">
+    <div id="account"></div>
+    <script src="js/account-page.js"></script>
+    <script type="text/javascript">
+      var account = document.getElementbyid("account");
+      const accountElm = Elm.Account.init({
+      node : account
+      });
+    </script>
+  </div>
+  <div id="menu1" class="tab-pane fade">
+    <div id="admin_page"></div>
+    <script src="js/admin-page.js"></script>
+    <script type="text/javascript">
+      var admin = document.getElementById("admin_page");
+      const adminScript = Elm.Admin.init({
+      node : admin
+      flags : { userName : "{{ user }}"} 
+      });
+    </script>
+  </div>
+</div>
+{% else %}
+<div id="account"></div>
+<script src="js/account-page.js"></script>
+<script type="text/javascript">
+  var account = document.getElementbyid("account");
+  const accountElm = Elm.Account.init({
+  node : account
+  });
+</script>
+{% endif %}
