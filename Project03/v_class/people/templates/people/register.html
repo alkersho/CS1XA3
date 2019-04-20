@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block content %}
+<div id="elm">
+
+</div>
+
+<script src="{% static "js/reg.js" %}"></script>
+<script type="text/javascript">
+  var myDiv = document.getElementById("elm");
+  const reg_app = Elm.Register.init({
+  node: myDiv
+  });
+</script>
+{% endblock %}
