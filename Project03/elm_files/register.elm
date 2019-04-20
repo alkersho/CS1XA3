@@ -83,7 +83,7 @@ update msg model =
           Ok val ->
             if val == "" then
               -- go to homepage
-              ({model | error_response = "Success2"}, Nav.load "/class/")
+              ({model | error_response = "Success2"}, Nav.load "e/alkersho/class/")
             else
               ({model | error_response = val}, Cmd.none)
           Err val ->
@@ -148,80 +148,10 @@ view model =
         Button.button [Button.primary, Button.onClick Create] [text "Submit"]
       ]
     ]
---
--- validateHtml : String -> Input.Option Msg
--- validateHtml string =
---     if string == "" then
---       Input.success
---     else
---       Input.danger
---
--- validatePassword : Model -> Model
--- validatePassword model =
---     let
---         -- valdatos that add text to finalVal
---         lengthVal =
---           if String.length model.password > 10 then
---             finalVal ++ ""
---           else
---             finalVal ++ "Password must be at least 10 chanracters."
---
---         finalVal = ""
---     in {model | passwordError = finalVal}
---
--- validatePasswordAgain : Model -> Model
--- validatePasswordAgain model =
---     let
---         matchVal =
---           if model.password == model.passwordAgain then
---               finalVal ++ ""
---           else
---               finalVal ++ "Passwords do not match!"
---         finalVal = ""
---     in {model | passwordAgainError = finalVal}
---
--- validateEmail : Model -> Model
--- validateEmail model =
---     let
---         -- valdatos that add text to finalVal
---         lengthVal =
---           if String.length model.password > 10 then
---             finalVal ++ ""
---           else
---             finalVal ++ "Password must be at least 10 chanracters."
---
---         finalVal = ""
---     in {model | emailError = finalVal}
---
--- validateDob : Model -> Model
--- validateDob model =
---     let
---         -- valdatos that add text to finalVal
---         lengthVal =
---           if String.length model.password > 10 then
---             finalVal ++ ""
---           else
---             finalVal ++ "Password must be at least 10 chanracters."
---
---         finalVal = ""
---     in {model | dobError = finalVal}
---
--- validateUserName : Model -> Model
--- validateUserName model =
---     let
---         -- valdatos that add text to finalVal
---         lengthVal =
---           if String.length model.password > 10 then
---             finalVal ++ ""
---           else
---             finalVal ++ "Password must be at least 10 chanracters."
---
---         finalVal = ""
---     in {model | userNameError = finalVal}
 
 sendData : Model -> Cmd Msg
 sendData model =
-    Http.post { url = "/account/register/",
+    Http.post { url = "",
       body = Http.jsonBody <| modelEncode model,
       expect = Http.expectString PostResponse }
 
