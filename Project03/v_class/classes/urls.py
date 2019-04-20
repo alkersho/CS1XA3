@@ -8,4 +8,5 @@ urlpatterns = [
     path('', views.main, name='main'),
     re_path(r'^(P?<class_name>[-/w]+)/$', views.cl),
     path('announcements/', views.announcements, name='all_announcements'),
+    path('classes/', views.classes)
 ]
