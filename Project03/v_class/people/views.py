@@ -1,26 +1,45 @@
 from django.http import HttpResponse
+from django.shortcuts import render, redirect
 from .models import Person
+from django.contrib.auth import authenticate, login, logout
 import json
 
 
 def main(request):
-    return HttpResponse('Main Account Page')
+    return render(request, 'base.html')
 
 
-def login(request):
-    return HttpResponse('Login Page')
+def login_page(request):
+    if request.body:
+        post = json.loads(request.body)
+        print(post)
+        user = authenticate(username=post['userName'],
+                            password=post['password'])
+        if user is not None:
+            login(request, user)
+            print("logged in")
+            return HttpResponse("")
+        else:
+            return HttpResponse("Wrong Username/Passowrd")
+    else:
+        return render(request, 'people/login.html')
+
+
+def logout_page(request):
+    logout(request)
+    return redirect("people:login")
 
 
 def register(request):
     if request.body:
         post = json.loads(request.body)
         try:
-            Person.objects.create_person(password=post['Password'],
-                                         first_name=post['First Name'],
-                                         last_name=post['Last Name'],
-                                         email=post['Email'],
-                                         dob=post['Date of Birth'],
-                                         gender=post['Gender'])
+            user = Person.objects.create_person(password=post['Password'],
+                                                first_name=post['First Name'],
+                                                last_name=post['Last Name'],
+                                                email=post['Email'],
+                                                dob=post['Date of Birth'],
+                                                gender=post['Gender'])
         except Exception:
             empty_fields = []
             values = list(post.values())
@@ -29,5 +48,6 @@ def register(request):
                 if values[i] == "":
                     empty_fields.append(keys[i])
             return HttpResponse("Fields are Empty: " + ', '.join(empty_fields))
+        login(request, user.user)
         return HttpResponse("")
-    return HttpResponse("Body is Empty")
+    return render(request, "people/register.html")
