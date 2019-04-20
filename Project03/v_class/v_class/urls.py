@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 # changed later to fit server
-root = ""
+root = "e/alkersho/"
 
 urlpatterns = [
     path(root + 'admin/', admin.site.urls),
