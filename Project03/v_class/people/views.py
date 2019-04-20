@@ -6,7 +6,14 @@ import json
 
 
 def main(request):
-    return render(request, 'base.html')
+    if request.user.is_authenticated:
+        name = request.user.username
+        user_type = Person.objects.filter(
+            user__username__startswith=name).first().user_type
+        context = {"type": user_type}
+        return render(request, 'people/account.html', context=context)
+    
+    return redirect("people:login")
 
 
 def login_page(request):
