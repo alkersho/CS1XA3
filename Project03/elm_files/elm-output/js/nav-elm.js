@@ -6139,7 +6139,7 @@ var author$project$NavBar$init = function (flag) {
 					elm$http$Http$get(
 					{
 						expect: A2(elm$http$Http$expectJson, author$project$NavBar$GetResponse, author$project$NavBar$decodeClasses),
-						url: 'e/alkersho/class/classes'
+						url: '/e/alkersho/class/classes'
 					})
 				]))) : _Utils_Tuple2(
 		A4(author$project$NavBar$Model, '', navState, _List_Nil, ''),
@@ -6786,11 +6786,22 @@ var elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var elm$html$Html$a = _VirtualDom_node('a');
+var elm$html$Html$h6 = _VirtualDom_node('h6');
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var rundis$elm_bootstrap$Bootstrap$Navbar$DropdownItem = function (a) {
 	return {$: 'DropdownItem', a: a};
 };
+var rundis$elm_bootstrap$Bootstrap$Navbar$dropdownHeader = function (children) {
+	return rundis$elm_bootstrap$Bootstrap$Navbar$DropdownItem(
+		A2(
+			elm$html$Html$h6,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$class('dropdown-header')
+				]),
+			children));
+};
+var elm$html$Html$a = _VirtualDom_node('a');
 var rundis$elm_bootstrap$Bootstrap$Navbar$dropdownItem = F2(
 	function (attributes, children) {
 		return rundis$elm_bootstrap$Bootstrap$Navbar$DropdownItem(
@@ -6805,24 +6816,35 @@ var rundis$elm_bootstrap$Bootstrap$Navbar$dropdownItem = F2(
 				children));
 	});
 var author$project$NavBar$classesDropDown = function (classes) {
-	if (classes.b) {
-		var x = classes.a;
-		var xs = classes.b;
-		return A2(
-			elm$core$List$cons,
-			A2(
-				rundis$elm_bootstrap$Bootstrap$Navbar$dropdownItem,
+	if (_Utils_eq(classes, _List_Nil)) {
+		return _List_fromArray(
+			[
+				rundis$elm_bootstrap$Bootstrap$Navbar$dropdownHeader(
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$href('/e/alkersho/class/' + x)
-					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text(x)
-					])),
-			author$project$NavBar$classesDropDown(xs));
+						elm$html$Html$text('No Classes!')
+					]))
+			]);
 	} else {
-		return _List_Nil;
+		if (classes.b) {
+			var x = classes.a;
+			var xs = classes.b;
+			return A2(
+				elm$core$List$cons,
+				A2(
+					rundis$elm_bootstrap$Bootstrap$Navbar$dropdownItem,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$href('/e/alkersho/class/' + x)
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(x)
+						])),
+				author$project$NavBar$classesDropDown(xs));
+		} else {
+			return _List_Nil;
+		}
 	}
 };
 var rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
@@ -7163,17 +7185,6 @@ var rundis$elm_bootstrap$Bootstrap$Navbar$NavDropdown = function (a) {
 var rundis$elm_bootstrap$Bootstrap$Navbar$dropdown = function (conf) {
 	return rundis$elm_bootstrap$Bootstrap$Navbar$NavDropdown(
 		rundis$elm_bootstrap$Bootstrap$Navbar$Dropdown(conf));
-};
-var elm$html$Html$h6 = _VirtualDom_node('h6');
-var rundis$elm_bootstrap$Bootstrap$Navbar$dropdownHeader = function (children) {
-	return rundis$elm_bootstrap$Bootstrap$Navbar$DropdownItem(
-		A2(
-			elm$html$Html$h6,
-			_List_fromArray(
-				[
-					elm$html$Html$Attributes$class('dropdown-header')
-				]),
-			children));
 };
 var rundis$elm_bootstrap$Bootstrap$Navbar$DropdownToggle = function (a) {
 	return {$: 'DropdownToggle', a: a};
@@ -8058,14 +8069,7 @@ var author$project$NavBar$view = function (model) {
 								rundis$elm_bootstrap$Bootstrap$Navbar$dropdown(
 								{
 									id: 'classesDropDown',
-									items: A2(
-										elm$core$List$cons,
-										rundis$elm_bootstrap$Bootstrap$Navbar$dropdownHeader(
-											_List_fromArray(
-												[
-													elm$html$Html$text('Classes')
-												])),
-										author$project$NavBar$classesDropDown(model.classes)),
+									items: author$project$NavBar$classesDropDown(model.classes),
 									toggle: A2(
 										rundis$elm_bootstrap$Bootstrap$Navbar$dropdownToggle,
 										_List_Nil,

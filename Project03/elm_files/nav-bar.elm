@@ -42,7 +42,7 @@ init flag =
       (Model flag.userName navState [] "", Cmd.batch [
         navCmd,
         Http.get {
-          url="e/alkersho/class/classes",
+          url="/e/alkersho/class/classes",
           expect = Http.expectJson GetResponse decodeClasses
       }
       ])
@@ -77,8 +77,7 @@ view model =
       Nav.dropdown {
         id = "classesDropDown"
         , toggle = Nav.dropdownToggle [] [text "Classes"]
-        , items =
-            Nav.dropdownHeader [text "Classes"] :: classesDropDown model.classes
+        , items = classesDropDown model.classes
       }
     ]
     |> Nav.customItems [
@@ -91,12 +90,14 @@ view model =
 
 classesDropDown : List String -> List (Nav.DropdownItem Msg)
 classesDropDown classes =
-    case classes of
-      x::xs ->
-        Nav.dropdownItem [ href <| "/e/alkersho/class/" ++ x] [text x] :: classesDropDown xs
-      [] ->
-        []
-
+    if classes == [] then
+        [Nav.dropdownHeader [text "No Classes!"]]
+    else
+      case classes of
+        x::xs ->
+          Nav.dropdownItem [ href <| "/e/alkersho/class/" ++ x] [text x] :: classesDropDown xs
+        [] ->
+          []
 
 -- need implementation server side
 decodeClasses : Decode.Decoder (List String)
