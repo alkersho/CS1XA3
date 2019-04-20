@@ -5952,7 +5952,7 @@ var author$project$Register$sendData = function (model) {
 			body: elm$http$Http$jsonBody(
 				author$project$Register$modelEncode(model)),
 			expect: elm$http$Http$expectString(author$project$Register$PostResponse),
-			url: '/account/register/'
+			url: ''
 		});
 };
 var elm$browser$Browser$External = function (a) {
