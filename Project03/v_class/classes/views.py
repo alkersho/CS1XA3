@@ -18,7 +18,7 @@ def announcements(request):
 def classes(request):
     username = request.user.username
     classes_objects = Person.objects.filter(
-        user__username__startswith=username).first().classes()
+        user__username__startswith=username).first().classes.all()
     class_list = [x.name for x in classes_objects]
     response = {"classes": class_list}
     return HttpResponse(response)
