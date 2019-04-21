@@ -81,9 +81,7 @@ view model =
       }
     ]
     |> Nav.customItems [
-      Nav.formItem [] [
-        loginButton model
-      ]
+      Nav.formItem [] <| loginButton model
     ]
     |> Nav.view model.navBarState
   ]
@@ -107,12 +105,15 @@ subs : Model -> Sub Msg
 subs model =
      Nav.subscriptions model.navBarState NavMsg
 
-loginButton : Model -> Html Msg
+loginButton : Model -> List (Html Msg)
 loginButton model =
     if model.userName == "" then
-      Button.linkButton [ Button.attrs [ href "/e/alkersho/account/login/" ] ] [ text "Login!"]
+      [Button.linkButton [ Button.attrs [ href "/e/alkersho/account/login/" ] ] [ text "Login!"]]
     else
-      Button.linkButton [ Button.attrs [ href "/e/alkersho/account/logout/" ] ] [ text <| "Hello, " ++ model.userName ++ "!"]
+      [
+      Button.linkButton [ Button.attrs [ href "/e/alkersho/account/" ]] [ text <| "Hello," ++ model.userName],
+      Button.linkButton [ Button.attrs [ href "/e/alkersho/account/logout/" ]] [text "Logout"]
+      ]
 
 errorHandler : Model -> Http.Error -> Model
 errorHandler model error =

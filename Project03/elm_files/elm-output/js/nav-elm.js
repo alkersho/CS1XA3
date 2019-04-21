@@ -7052,33 +7052,53 @@ var rundis$elm_bootstrap$Bootstrap$Button$linkButton = F2(
 			children);
 	});
 var author$project$NavBar$loginButton = function (model) {
-	return (model.userName === '') ? A2(
-		rundis$elm_bootstrap$Bootstrap$Button$linkButton,
-		_List_fromArray(
-			[
-				rundis$elm_bootstrap$Bootstrap$Button$attrs(
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$href('/e/alkersho/account/login/')
-					]))
-			]),
-		_List_fromArray(
-			[
-				elm$html$Html$text('Login!')
-			])) : A2(
-		rundis$elm_bootstrap$Bootstrap$Button$linkButton,
-		_List_fromArray(
-			[
-				rundis$elm_bootstrap$Bootstrap$Button$attrs(
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$href('/e/alkersho/account/logout/')
-					]))
-			]),
-		_List_fromArray(
-			[
-				elm$html$Html$text('Hello, ' + (model.userName + '!'))
-			]));
+	return (model.userName === '') ? _List_fromArray(
+		[
+			A2(
+			rundis$elm_bootstrap$Bootstrap$Button$linkButton,
+			_List_fromArray(
+				[
+					rundis$elm_bootstrap$Bootstrap$Button$attrs(
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$href('/e/alkersho/account/login/')
+						]))
+				]),
+			_List_fromArray(
+				[
+					elm$html$Html$text('Login!')
+				]))
+		]) : _List_fromArray(
+		[
+			A2(
+			rundis$elm_bootstrap$Bootstrap$Button$linkButton,
+			_List_fromArray(
+				[
+					rundis$elm_bootstrap$Bootstrap$Button$attrs(
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$href('/e/alkersho/account/')
+						]))
+				]),
+			_List_fromArray(
+				[
+					elm$html$Html$text('Hello,' + model.userName)
+				])),
+			A2(
+			rundis$elm_bootstrap$Bootstrap$Button$linkButton,
+			_List_fromArray(
+				[
+					rundis$elm_bootstrap$Bootstrap$Button$attrs(
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$href('/e/alkersho/account/logout/')
+						]))
+				]),
+			_List_fromArray(
+				[
+					elm$html$Html$text('Logout')
+				]))
+		]);
 };
 var elm$html$Html$div = _VirtualDom_node('div');
 var rundis$elm_bootstrap$Bootstrap$Grid$container = F2(
@@ -8050,10 +8070,7 @@ var author$project$NavBar$view = function (model) {
 							A2(
 							rundis$elm_bootstrap$Bootstrap$Navbar$formItem,
 							_List_Nil,
-							_List_fromArray(
-								[
-									author$project$NavBar$loginButton(model)
-								]))
+							author$project$NavBar$loginButton(model))
 						]),
 					A2(
 						rundis$elm_bootstrap$Bootstrap$Navbar$items,
