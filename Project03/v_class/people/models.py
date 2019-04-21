@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.contrib import admin
 
 
 class PersonManager(models.Manager):
@@ -49,7 +50,8 @@ class Person(models.Model):
                                  default='STD')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    classes = models.ManyToManyField('classes.Class')
+    classes = models.ManyToManyField('classes.Class',
+                                     blank=True)
     dob = models.DateField(null=True)
     gender = models.CharField(max_length=20,
                               choices=[('M', 'Male'), ('F', 'Female')],
@@ -60,3 +62,6 @@ class Person(models.Model):
     class Meta:
         permissions = (('can_change_person_type', 'Change Account Type'),
                        ('can_change_name', 'Change User Name'))
+
+
+admin.site.register(Person)
