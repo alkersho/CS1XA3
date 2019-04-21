@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Bootstrap.Form.Select as Select
 import Bootstrap.Button as Button
+import Bootstrap.Form.Input as Input
 import Bootstrap.Table as Table
 import Bootstrap.Grid as Grid
 import Bootstrap.Alert as Alert
@@ -23,7 +24,8 @@ main =
 
 type alias Model = {
     users : List User,
-    error : String
+    error : String,
+    searchUser : String
   }
 
 type alias User = {
@@ -35,11 +37,13 @@ type Msg =
     ChangeType String String
   | PostResponce (Result Http.Error String)
   | GetResponce (Result Http.Error (List User))
+  | SearchUser String
+  | SearchButton
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( { users = [], error = "" }, Http.get { url = "/e/alkersho/account/accounts/"
+    ( { users = [], error = "", searchUser = ""}, Http.get { url = "/e/alkersho/account/accounts/"
     , expect = Http.expectJson GetResponce decodeResponce })
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -63,6 +67,14 @@ update msg model =
               ({model | users = val}, Cmd.none)
             Err val ->
               (errorHandler model val, Cmd.none)
+        SearchUser val ->
+          ({model | searchUser = val}, Cmd.none)
+        SearchButton ->
+          (model, Http.post {
+            url = "/e/alkersho/account/accounts/",
+            body = Http.jsonBody <| Encode.object [("userSearch", Encode.string model.searchUser)],
+            expect = Http.expectJson GetResponce decodeResponce
+          })
 
 setType : String -> String -> Cmd Msg
 setType username newType =
@@ -118,7 +130,12 @@ view model =
         , Table.td [] [text "User Type:"]
       ]
     ]
-    , tbody = Table.tbody [] <| users model
+    , tbody = Table.tbody [] <|
+      Table.tr [] [
+        Table.td [] [Input.text [Input.value model.searchUser, Input.placeholder "Search...", Input.onInput SearchUser]],
+        Table.td [] [Button.button [Button.primary, Button.onClick SearchButton] [text "Search"]]
+      ]
+       :: users model
    }
   ]
 
