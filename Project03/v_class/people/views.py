@@ -60,11 +60,20 @@ def main(request):
 def acount_list(request):
     if request.body:
         post = json.loads(request.body)
-        p = Person.objects.filter(
-            user__username__startswith=post['username']).first()
-        p.user_type = post['newType']
-        p.save()
-        return HttpResponse("")
+        if "userSearch" in post.keys():
+            users_types = [{"username": x.user.username,
+                            "userType": x.user_type}
+                           for x in Person.objects.filter(
+                                   user__username__contains=post['userSearch']
+                           )]
+            responce = json.dumps({"responce": users_types})
+            return HttpResponse(responce)
+        else:
+            p = Person.objects.filter(
+                user__username__startswith=post['username']).first()
+            p.user_type = post['newType']
+            p.save()
+            return HttpResponse("")
     users_types = [{"username": x.user.username,
                     "userType": x.user_type}
                    for x in Person.objects.all()]
