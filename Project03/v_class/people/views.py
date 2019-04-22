@@ -41,7 +41,6 @@ def main(request):
         email = user.user.email
         gender = user.get_gender_display()
         dob = user.dob.strftime("%d/%m/%Y")
-        classes = [x.name for x in user.classes.all()]
         user_type = user.user_type
         type_display = user.get_user_type_display()
         context = {"type": user_type,
@@ -51,7 +50,6 @@ def main(request):
                    "userName": username,
                    "email": email,
                    "gender": gender,
-                   "classes": classes,
                    "dob": dob}
         return render(request, 'people/account.html', context=context)
     return redirect("people:login")
