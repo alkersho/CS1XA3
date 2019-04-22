@@ -1,14 +1,17 @@
 from django.db import models
 from people.models import Person
-from classes.models import Class
+
+
+class Topic(models.Model):
+    name = models.CharField(max_length=50, unique=True, editable=False)
 
 
 class Post(models.Model):
     title = models.CharField(max_length=150)
     owner = models.ForeignKey(Person, on_delete=models.CASCADE)
     body = models.CharField(max_length=1000)
-    cl = models.ForeignKey(Class, on_delete=models.CASCADE)
     date = models.DateField(auto_now=True)
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         permissions = (('can_edit_title', 'Edit Title'),

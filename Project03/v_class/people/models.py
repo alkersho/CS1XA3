@@ -4,6 +4,8 @@ from datetime import datetime
 from django.contrib import admin
 
 
+# TODO: only send a message saying the user is already used,
+# do not make a username
 class PersonManager(models.Manager):
     def create_person(self, first_name, last_name, password, **kwargs):
         username = last_name + first_name[0]
@@ -40,18 +42,15 @@ class PersonManager(models.Manager):
 
 class Person(models.Model):
     PERSON_TYPES = [
-        ("TCHR", "Teacher"),
-        ("STD", "Student"),  # best abbreviaiton accident ever
+        ("USR", "User"),  # best abbreviaiton accident ever
         ("ADM", "Admin")
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.CharField(max_length=20,
                                  choices=PERSON_TYPES,
-                                 default='STD')
+                                 default='USR')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    classes = models.ManyToManyField('classes.Class',
-                                     blank=True)
     dob = models.DateField(null=True)
     gender = models.CharField(max_length=20,
                               choices=[('M', 'Male'), ('F', 'Female')],
