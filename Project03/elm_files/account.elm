@@ -36,7 +36,6 @@ type alias Model = {
     passwordEdit : String,
     editingPass : Bool,
     gender : String,
-    classes : List String,
     dob : String,
     error : String
   }
@@ -56,7 +55,6 @@ type alias Flag = {
     userName : String,
     email : String,
     gender : String,
-    classes : List String,
     dob : String
   }
 
@@ -79,7 +77,6 @@ init flag =
     ""
     False
     flag.gender
-    flag.classes
     flag.dob
     "", Cmd.none)
 
@@ -167,10 +164,6 @@ view model =
         Table.tr [] [
           Table.td [] [text "Gender:"],
           Table.td [] [text model.gender]
-        ],
-        Table.tr [] [
-          Table.td [] [text "Classes:"],
-          Table.td [] [Lists.ul <| classes model.classes]
         ]
       ] ++ changePass model ++ [errorMsg model] }
     ]
@@ -242,16 +235,6 @@ editingEmail model =
             [Input.email [Input.onInput Email, Input.value model.emailEdit], iconWithOptions check Solid [] [style "cursor" "pointer", onClick <| EditEmail False, Spacing.myAuto]]
         False ->
             [text model.email, iconWithOptions edit Solid [HtmlTag Span] [style "cursor" "pointer", onClick <| EditEmail True, Spacing.mlAuto]]
-
-classes : List String -> List (Lists.Item Msg)
-classes strs =
-    case strs of
-      x::[] ->
-        [Lists.li [] [text x]]
-      x::xs ->
-        Lists.li [] [text x] :: classes xs
-      [] ->
-        [Lists.li [] [text "No Classes!"]]
 
 errorHandler : Model -> Http.Error -> Model
 errorHandler model error =

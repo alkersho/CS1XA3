@@ -6258,7 +6258,7 @@ var author$project$Register$update = F2(
 						_Utils_update(
 							model,
 							{error_response: 'Success2'}),
-						elm$browser$Browser$Navigation$load('/class/')) : _Utils_Tuple2(
+						elm$browser$Browser$Navigation$load('/e/alkersho/account/')) : _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{error_response: val}),

@@ -4496,11 +4496,9 @@ var author$project$Account$Model = function (fName) {
 								return function (passwordEdit) {
 									return function (editingPass) {
 										return function (gender) {
-											return function (classes) {
-												return function (dob) {
-													return function (error) {
-														return {classes: classes, currentPass: currentPass, dob: dob, editingEmail: editingEmail, editingPass: editingPass, email: email, emailEdit: emailEdit, error: error, fName: fName, gender: gender, lName: lName, passwordEdit: passwordEdit, userName: userName, userType: userType};
-													};
+											return function (dob) {
+												return function (error) {
+													return {currentPass: currentPass, dob: dob, editingEmail: editingEmail, editingPass: editingPass, email: email, emailEdit: emailEdit, error: error, fName: fName, gender: gender, lName: lName, passwordEdit: passwordEdit, userName: userName, userType: userType};
 												};
 											};
 										};
@@ -4993,7 +4991,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Account$init = function (flag) {
 	return _Utils_Tuple2(
-		author$project$Account$Model(flag.fName)(flag.lName)(flag.userType)(flag.userName)(flag.email)(false)('')('')('')(false)(flag.gender)(flag.classes)(flag.dob)(''),
+		author$project$Account$Model(flag.fName)(flag.lName)(flag.userType)(flag.userName)(flag.email)(false)('')('')('')(false)(flag.gender)(flag.dob)(''),
 		elm$core$Platform$Cmd$none);
 };
 var author$project$Account$EmailResponce = function (a) {
@@ -6016,7 +6014,7 @@ var author$project$Account$update = F2(
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{editingEmail: false, email: model.emailEdit}),
+								{editingEmail: false, email: model.emailEdit, error: ''}),
 							elm$core$Platform$Cmd$none);
 					} else {
 						return _Utils_Tuple2(
@@ -6039,7 +6037,7 @@ var author$project$Account$update = F2(
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{editingPass: false}),
+								{editingPass: false, error: ''}),
 							elm$core$Platform$Cmd$none);
 					} else {
 						return _Utils_Tuple2(
@@ -6683,56 +6681,6 @@ var author$project$Account$changePass = function (model) {
 				]))
 		]);
 };
-var elm$html$Html$li = _VirtualDom_node('li');
-var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$Item = function (a) {
-	return {$: 'Item', a: a};
-};
-var rundis$elm_bootstrap$Bootstrap$ListGroup$li = F2(
-	function (options, children) {
-		return rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$Item(
-			{children: children, itemFn: elm$html$Html$li, options: options});
-	});
-var author$project$Account$classes = function (strs) {
-	if (strs.b) {
-		if (!strs.b.b) {
-			var x = strs.a;
-			return _List_fromArray(
-				[
-					A2(
-					rundis$elm_bootstrap$Bootstrap$ListGroup$li,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text(x)
-						]))
-				]);
-		} else {
-			var x = strs.a;
-			var xs = strs.b;
-			return A2(
-				elm$core$List$cons,
-				A2(
-					rundis$elm_bootstrap$Bootstrap$ListGroup$li,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text(x)
-						])),
-				author$project$Account$classes(xs));
-		}
-	} else {
-		return _List_fromArray(
-			[
-				A2(
-				rundis$elm_bootstrap$Bootstrap$ListGroup$li,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text('No Classes!')
-					]))
-			]);
-	}
-};
 var author$project$Account$EditEmail = function (a) {
 	return {$: 'EditEmail', a: a};
 };
@@ -7195,124 +7143,6 @@ var rundis$elm_bootstrap$Bootstrap$Grid$container = F2(
 				attributes),
 			children);
 	});
-var elm$html$Html$ul = _VirtualDom_node('ul');
-var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$applyModifier = F2(
-	function (modifier, options) {
-		switch (modifier.$) {
-			case 'Roled':
-				var role = modifier.a;
-				return _Utils_update(
-					options,
-					{
-						role: elm$core$Maybe$Just(role)
-					});
-			case 'Action':
-				return _Utils_update(
-					options,
-					{action: true});
-			case 'Disabled':
-				return _Utils_update(
-					options,
-					{disabled: true});
-			case 'Active':
-				return _Utils_update(
-					options,
-					{active: true});
-			default:
-				var attrs = modifier.a;
-				return _Utils_update(
-					options,
-					{
-						attributes: _Utils_ap(options.attributes, attrs)
-					});
-		}
-	});
-var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$defaultOptions = {action: false, active: false, attributes: _List_Nil, disabled: false, role: elm$core$Maybe$Nothing};
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass = F2(
-	function (prefix, role) {
-		return elm$html$Html$Attributes$class(
-			prefix + ('-' + function () {
-				switch (role.$) {
-					case 'Primary':
-						return 'primary';
-					case 'Secondary':
-						return 'secondary';
-					case 'Success':
-						return 'success';
-					case 'Info':
-						return 'info';
-					case 'Warning':
-						return 'warning';
-					case 'Danger':
-						return 'danger';
-					case 'Light':
-						return 'light';
-					default:
-						return 'dark';
-				}
-			}()));
-	});
-var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$itemAttributes = function (options) {
-	return _Utils_ap(
-		_List_fromArray(
-			[
-				elm$html$Html$Attributes$classList(
-				_List_fromArray(
-					[
-						_Utils_Tuple2('list-group-item', true),
-						_Utils_Tuple2('disabled', options.disabled),
-						_Utils_Tuple2('active', options.active),
-						_Utils_Tuple2('list-group-item-action', options.action)
-					]))
-			]),
-		_Utils_ap(
-			_List_fromArray(
-				[
-					elm$html$Html$Attributes$disabled(options.disabled)
-				]),
-			_Utils_ap(
-				A2(
-					elm$core$Maybe$withDefault,
-					_List_Nil,
-					A2(
-						elm$core$Maybe$map,
-						function (r) {
-							return _List_fromArray(
-								[
-									A2(rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass, 'list-group-item', r)
-								]);
-						},
-						options.role)),
-				options.attributes)));
-};
-var rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$renderItem = function (_n0) {
-	var itemFn = _n0.a.itemFn;
-	var options = _n0.a.options;
-	var children = _n0.a.children;
-	return A2(
-		itemFn,
-		rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$itemAttributes(
-			A3(elm$core$List$foldl, rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$applyModifier, rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$defaultOptions, options)),
-		children);
-};
-var rundis$elm_bootstrap$Bootstrap$ListGroup$ul = function (items) {
-	return A2(
-		elm$html$Html$ul,
-		_List_fromArray(
-			[
-				elm$html$Html$Attributes$class('list-group')
-			]),
-		A2(elm$core$List$map, rundis$elm_bootstrap$Bootstrap$Internal$ListGroup$renderItem, items));
-};
 var rundis$elm_bootstrap$Bootstrap$General$Internal$MD = {$: 'MD'};
 var rundis$elm_bootstrap$Bootstrap$Table$Responsive = function (a) {
 	return {$: 'Responsive', a: a};
@@ -7520,6 +7350,15 @@ var elm$core$List$head = function (list) {
 		return elm$core$Maybe$Nothing;
 	}
 };
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var rundis$elm_bootstrap$Bootstrap$Table$maybeWrapResponsive = F2(
 	function (options, table_) {
 		var responsiveClass = elm$html$Html$Attributes$class(
@@ -7621,6 +7460,30 @@ var rundis$elm_bootstrap$Bootstrap$Table$maybeAddScopeToFirstCell = function (ro
 var elm$html$Html$tr = _VirtualDom_node('tr');
 var elm$html$Html$td = _VirtualDom_node('td');
 var elm$html$Html$th = _VirtualDom_node('th');
+var rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass = F2(
+	function (prefix, role) {
+		return elm$html$Html$Attributes$class(
+			prefix + ('-' + function () {
+				switch (role.$) {
+					case 'Primary':
+						return 'primary';
+					case 'Secondary':
+						return 'secondary';
+					case 'Success':
+						return 'success';
+					case 'Info':
+						return 'info';
+					case 'Warning':
+						return 'warning';
+					case 'Danger':
+						return 'danger';
+					case 'Light':
+						return 'light';
+					default:
+						return 'dark';
+				}
+			}()));
+	});
 var rundis$elm_bootstrap$Bootstrap$Table$cellAttribute = function (option) {
 	switch (option.$) {
 		case 'RoledCell':
@@ -7998,27 +7861,6 @@ var author$project$Account$view = function (model) {
 												[
 													elm$html$Html$text(model.gender)
 												]))
-										])),
-									A2(
-									rundis$elm_bootstrap$Bootstrap$Table$tr,
-									_List_Nil,
-									_List_fromArray(
-										[
-											A2(
-											rundis$elm_bootstrap$Bootstrap$Table$td,
-											_List_Nil,
-											_List_fromArray(
-												[
-													elm$html$Html$text('Classes:')
-												])),
-											A2(
-											rundis$elm_bootstrap$Bootstrap$Table$td,
-											_List_Nil,
-											_List_fromArray(
-												[
-													rundis$elm_bootstrap$Bootstrap$ListGroup$ul(
-													author$project$Account$classes(model.classes))
-												]))
 										]))
 								]),
 							_Utils_ap(
@@ -8236,7 +8078,6 @@ var elm$browser$Browser$element = _Browser_element;
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var elm$json$Json$Decode$andThen = _Json_andThen;
-var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Account$main = elm$browser$Browser$element(
 	{
 		init: author$project$Account$init,
@@ -8268,16 +8109,8 @@ _Platform_export({'Account':{'init':author$project$Account$main(
 													return A2(
 														elm$json$Json$Decode$andThen,
 														function (dob) {
-															return A2(
-																elm$json$Json$Decode$andThen,
-																function (classes) {
-																	return elm$json$Json$Decode$succeed(
-																		{classes: classes, dob: dob, email: email, fName: fName, gender: gender, lName: lName, userName: userName, userType: userType});
-																},
-																A2(
-																	elm$json$Json$Decode$field,
-																	'classes',
-																	elm$json$Json$Decode$list(elm$json$Json$Decode$string)));
+															return elm$json$Json$Decode$succeed(
+																{dob: dob, email: email, fName: fName, gender: gender, lName: lName, userName: userName, userType: userType});
 														},
 														A2(elm$json$Json$Decode$field, 'dob', elm$json$Json$Decode$string));
 												},

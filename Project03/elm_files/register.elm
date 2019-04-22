@@ -83,7 +83,7 @@ update msg model =
           Ok val ->
             if val == "" then
               -- go to homepage
-              ({model | error_response = "Success2"}, Nav.load "e/alkersho/class/")
+              ({model | error_response = "Success2"}, Nav.load "/e/alkersho/account/")
             else
               ({model | error_response = val}, Cmd.none)
           Err val ->
