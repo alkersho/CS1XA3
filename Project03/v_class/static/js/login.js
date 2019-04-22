@@ -6161,6 +6161,10 @@ var author$project$Login$update = F2(
 						model,
 						{password: string}),
 					elm$core$Platform$Cmd$none);
+			case 'Register':
+				return _Utils_Tuple2(
+					model,
+					elm$browser$Browser$Navigation$load('/e/alkersho/account/register/'));
 			case 'Login':
 				return _Utils_Tuple2(
 					model,
@@ -6188,6 +6192,7 @@ var author$project$Login$Login = {$: 'Login'};
 var author$project$Login$Password = function (a) {
 	return {$: 'Password', a: a};
 };
+var author$project$Login$Register = {$: 'Register'};
 var author$project$Login$UserName = function (a) {
 	return {$: 'UserName', a: a};
 };
@@ -6664,6 +6669,9 @@ var rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled = function (a) {
 };
 var rundis$elm_bootstrap$Bootstrap$Button$primary = rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring(
 	rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled(rundis$elm_bootstrap$Bootstrap$Internal$Button$Primary));
+var rundis$elm_bootstrap$Bootstrap$Internal$Button$Link = {$: 'Link'};
+var rundis$elm_bootstrap$Bootstrap$Button$roleLink = rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring(
+	rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled(rundis$elm_bootstrap$Bootstrap$Internal$Button$Link));
 var elm$html$Html$label = _VirtualDom_node('label');
 var rundis$elm_bootstrap$Bootstrap$Form$label = F2(
 	function (attributes, children) {
@@ -6977,6 +6985,17 @@ var author$project$Login$view = function (model) {
 				_List_fromArray(
 					[
 						elm$html$Html$text('Login!')
+					])),
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Button$button,
+				_List_fromArray(
+					[
+						rundis$elm_bootstrap$Bootstrap$Button$roleLink,
+						rundis$elm_bootstrap$Bootstrap$Button$onClick(author$project$Login$Register)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Register')
 					]))
 			]));
 };

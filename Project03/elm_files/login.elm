@@ -30,6 +30,7 @@ type alias Model = {
 type Msg = UserName String
          | Password String
          | Login
+         | Register
          | PostResponse (Result Http.Error String)
 
 init : () -> (Model, Cmd Msg)
@@ -43,6 +44,8 @@ update msg model =
             ({model | userName = string}, Cmd.none)
         Password string ->
             ({model | password = string}, Cmd.none)
+        Register ->
+          (model, Nav.load "/e/alkersho/account/register/")
         Login ->
             (model, sendLogin model)
         PostResponse result ->
@@ -63,7 +66,8 @@ view model =
       Input.text [ Input.onInput UserName, Input.attrs [ style "max-width" "300px"] ],
       F.label [] [text "Passowrd:"],
       Input.password [ Input.onInput Password, Input.attrs [ style "max-width" "300px"] ],
-      Button.button [ Button.primary, Button.onClick Login] [ text "Login!" ]
+      Button.button [ Button.primary, Button.onClick Login] [ text "Login!" ],
+      Button.button [ Button.roleLink, Button.onClick Register] [ text "Register"]
     ]
 
 sendLogin : Model -> Cmd Msg
