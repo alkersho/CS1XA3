@@ -58,6 +58,9 @@ class Person(models.Model):
 
     objects = PersonManager()
 
+    def __str__(self):
+        return self.user.username
+
     class Meta:
         permissions = (('can_change_person_type', 'Change Account Type'),
                        ('can_change_name', 'Change User Name'))
