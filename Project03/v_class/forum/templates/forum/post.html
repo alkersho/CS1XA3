@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div id="post"></div>
+<script src="{% static "js/post_view.js" %}"></script>
+<script type="text/javascript">
+  var post = document.getElementById("post");
+  const flag = {
+  "title": "{{ title }}",
+  "body": "{{ body }}",
+  "id": "{{ id }}",
+  "canEdit": {{ canEdit|yesno:"true,false" }},
+  };
+  const postApp = Elm.Post.init({
+  node: post,
+  flags: flag
+  });
+</script>
+{% endblock %}

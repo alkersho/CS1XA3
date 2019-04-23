@@ -25,7 +25,14 @@ def main(request):
 
 
 def view_post(request, post_id):
-    return HttpResponse('View Post, id:' + str(post_id))
+    post = Post.objects.get(pk=post_id)
+    context = {
+        "title": post.title,
+        "body": post.body,
+        "id": post.pk,
+        "canEdit": post.owner.user is request.user,
+    }
+    return render(request, "forum/post.html", context=context)
 
 
 def create_post(request):
