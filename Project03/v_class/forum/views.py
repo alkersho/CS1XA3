@@ -6,7 +6,22 @@ from people.models import Person
 
 
 def main(request):
-    return HttpResponse('Main Forum page')
+    if request.method == "POST":
+        post = json.loads(request.body)
+        name = post['postName']
+        posts = [
+            {"title": x.title,
+             "id": x.id}
+            for x in Post.objects.filter(title__contains=name)
+        ]
+        return HttpResponse(json.dumps(posts))
+
+    posts = [
+        {"title": x.title,
+         "id": x.id}
+        for x in Post.objects.all()
+    ]
+    return render(request, "forum/forum.html", context={"posts": posts})
 
 
 def view_post(request, post_id):
