@@ -10,7 +10,7 @@
   var post = document.getElementById("post");
   const flag = {
   "title": "{{ title }}",
-  "body": "{{ body }}",
+  "body": `{{ body }}`,
   "id": "{{ id }}",
   "canEdit": {{ canEdit|yesno:"true,false" }},
   };
@@ -23,12 +23,12 @@
 <script src="{% static "js/comments.js" %}"></script>
 <script type="text/javascript">
   var commentSection = document.getElementById("comments");
-  const flag = {
-  "comments": {{ comments|safe }},
+  const commentFlag = {
   "postID": "{{ post_id }}"
   };
   const commentApp = Elm.Comments.init({
   node: commentSection,
-  flags: flag
+  flags: commentFlag
   });
+</script>
 {% endblock %}

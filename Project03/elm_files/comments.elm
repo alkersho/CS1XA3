@@ -5,8 +5,12 @@ import Bootstrap.Form.Input as Input
 import Bootstrap.Utilities.Border as Border
 import Bootstrap.Alert as Alert
 import Bootstrap.Grid as Grid
-import FontAwesome exposing (icon, iconWithOptions, reply, Style(..))
+import Bootstrap.Form.Textarea as Textarea
+import Bootstrap.Accordion as Accordion
+import Bootstrap.Card.Block as Block
+import FontAwesome exposing (icon, reply)
 import Browser
+import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -22,7 +26,7 @@ main =
     init = init
     , update = update
     , view = view
-    , subscriptions = \_-> Sub.none
+    , subscriptions = subscription
   }
 
 type Children =
@@ -37,7 +41,6 @@ type alias CommentRecord =
 
 type alias Flag = {
   postID : String
-  , comments : Encode.Value
   }
 
 type alias Model =
@@ -46,21 +49,28 @@ type alias Model =
     , comments : List CommentRecord
     , newCommentBody : String
     , error : String
+    , acState : Accordion.State
   }
 
 type Msg =
   NoOp
+  | GetComments (Result Http.Error (List CommentRecord))
   | EditCommentBody String
   | AddParentComment
   | AddSubComment String
   | PostResponce (Result Http.Error String)
+  | AccordionMsg Accordion.State
 
 init : Flag -> (Model, Cmd Msg)
 init flag =
     ( { postID = flag.postID
     , comments = []
     , newCommentBody = ""
-    , error = "" }, Cmd.none )
+    , error = ""
+    , acState = Accordion.initialState }, Http.get {
+      url = "/e/alkersho/forum/comment-"++ flag.postID ++"--1/"
+      , expect = Http.expectJson GetComments <| Decode.list decodeCommentRecord
+    } )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -71,29 +81,36 @@ update msg model =
           ({model | newCommentBody = string} , Cmd.none)
         AddParentComment ->
           (model, Http.post
-            { url = "/e/alkersho/forum/comment-" ++ model.postID ++ "-1/"
+            { url = "/e/alkersho/forum/comment-" ++ model.postID ++ "--1/"
             , body = Http.jsonBody <| encodeCommentParent model.newCommentBody
             , expect = Http.expectString PostResponce
             })
         AddSubComment commentId ->
           (model, Http.post
-            { url = "/e/alkersho/forum/comment-" ++ model.postID
+            { url = "/e/alkersho/forum/comment-" ++ model.postID ++ "-"
             ++ commentId ++ "/"
             , body = Http.jsonBody
             <| encodeCommentChild model.newCommentBody commentId
             , expect = Http.expectString PostResponce
             })
-
+        GetComments result ->
+          case result of
+            Ok val ->
+              ({model | comments = val}, Cmd.none)
+            Err val ->
+              (errorHandler model val, Cmd.none)
         PostResponce result ->
           case result of
             Ok val ->
               case val of
                 "" ->
-                  (model, Cmd.none)
+                  (model, Nav.reload )
                 _ ->
                   ({model | error = val}, Cmd.none)
             Err val ->
               (errorHandler model val, Cmd.none)
+        AccordionMsg state ->
+          ({model | acState = state}, Cmd.none)
 
 encodeCommentParent : String -> Encode.Value
 encodeCommentParent v =
@@ -139,29 +156,59 @@ errorHandler model error =
 view : Model -> Html Msg
 view model =
     Grid.container [] <| [
-      Button.button [ Button.light, Button.onClick AddParentComment ] [
-        icon reply, text "Reply"
-      ]
-    ] ++ commentView model.comments
+      errorView model
+      , Accordion.config AccordionMsg
+        |> Accordion.withAnimation
+        |> Accordion.cards [
+          Accordion.card {
+          id = "mainComment"
+          , header =
+             Accordion.header [] <| Accordion.toggle [] [icon reply, text "Reply"]
+          , blocks = [
+            Accordion.block [] [
+              Block.custom (Textarea.textarea [ Textarea.onInput EditCommentBody])
+              , Block.custom (Button.button [ Button.primary, Button.onClick AddParentComment] [ text "Submit"])
+            ]
+          ]
+          , options = []
+        }
+        ]
+        |> Accordion.view model.acState
+    ] ++ commentView model.comments model
 
-commentView : List CommentRecord -> List (Html Msg)
-commentView commentRecord =
+commentView : List CommentRecord -> Model -> List (Html Msg)
+commentView commentRecord model =
   let
       comment : CommentRecord -> Html Msg
       comment record =
         Grid.container [] [
         text record.body
-        , iconWithOptions reply Solid []
-          [ onClick <| AddSubComment <| String.fromInt record.commentID ]
-        , div [ Border.left ] <| commentView <| commentFromChildren record.children
+        , Accordion.config AccordionMsg
+          |> Accordion.withAnimation
+          |> Accordion.cards [
+            Accordion.card {
+              id = String.fromInt record.commentID
+              , options = []
+              , header = Accordion.header [] <| Accordion.toggle [] [icon reply]
+              , blocks = [
+                Accordion.block [] [
+                  Block.custom (Textarea.textarea [ Textarea.onInput EditCommentBody])
+                  , Block.custom (Button.button [ Button.primary, Button.onClick <| AddSubComment
+                                  <| String.fromInt record.commentID] [ text "Submit"])
+                ]
+              ]
+            }
+          ]
+          |> Accordion.view model.acState
+        , div [ Border.left ] <| commentView (commentFromChildren record.children) model
         ]
   in case commentRecord of
-      [] ->
-        [text "No Comments"]
       [x] ->
         [comment x]
       x::xs ->
-        comment x :: commentView xs
+        comment x :: commentView xs model
+      [] ->
+        [text "No Comments"]
 
 commentFromChildren : Children -> List CommentRecord
 commentFromChildren children =
@@ -176,3 +223,7 @@ errorView model =
         div [] []
       _ ->
         Alert.simpleDanger [] [text model.error]
+
+subscription : Model -> Sub Msg
+subscription model =
+    Accordion.subscriptions model.acState AccordionMsg

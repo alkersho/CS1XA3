@@ -32,9 +32,21 @@ class Post(models.Model):
 class Comment(models.Model):
     owner = models.ForeignKey(Person, on_delete=models.CASCADE)
     body = models.CharField(max_length=500)
-    sub_comment = models.ForeignKey('self', on_delete=models.CASCADE)
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE,
+                                       related_name="children",
+                                       related_query_name="children",
+                                       null=True,
+                                       blank=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     date = models.DateField(auto_now=True)
+
+    def get_children(self):
+        children = [{"postID": x.post.pk,
+                     "body": x.body,
+                     "commentID": x.pk,
+                     "children": x.get_children()}
+                    for x in self.children.all()]
+        return children
 
     def __str__(self):
         return "At: {}. By: {}. {}".format(
@@ -45,5 +57,6 @@ class Comment(models.Model):
                        ('can_delete_comment', 'Delete Comment'))
 
 
+admin.site.register(Comment)
 admin.site.register(Topic)
 admin.site.register(Post)
