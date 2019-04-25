@@ -9,6 +9,7 @@ import Bootstrap.Form.Input as Input
 import Bootstrap.Table as Table
 import Bootstrap.Grid as Grid
 import Bootstrap.Alert as Alert
+import Bootstrap.Tab as Tab
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Browser as Browser
@@ -25,7 +26,10 @@ main =
 type alias Model = {
     users : List User,
     error : String,
-    searchUser : String
+    searchUser : String,
+    tab_state : Tab.State,
+    topics : List Topic,
+    new_topic : String
   }
 
 type alias User = {
@@ -33,18 +37,37 @@ type alias User = {
   userType : String
   }
 
+type alias Topic = {
+  id : Int,
+  name : String
+  }
+
 type Msg =
     ChangeType String String
   | PostResponce (Result Http.Error String)
-  | GetResponce (Result Http.Error (List User))
+  | GetUsersResponce (Result Http.Error (List User))
   | SearchUser String
   | SearchButton
+  | TabMsg Tab.State
+  | DeleteTopic Int
+  | NewTopic String
+  | AddTopic
+  -- | GetTopicResponce
 
+type alias Flag = {
+  users : List User,
+  topics : List Topic
+  }
 
-init : () -> (Model, Cmd Msg)
-init _ =
-    ( { users = [], error = "", searchUser = ""}, Http.get { url = "/e/alkersho/account/accounts/"
-    , expect = Http.expectJson GetResponce decodeResponce })
+init : Flag -> (Model, Cmd Msg)
+init flag =
+    ( { users = flag.users
+    , error = ""
+    , searchUser = ""
+    , tab_state = Tab.initialState
+    , topics = flag.topics
+    , new_topic = ""
+    }, Cmd.none)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -61,7 +84,7 @@ update msg model =
                   ({model | error = val}, Cmd.none)
             Err val ->
               (errorHandler model val, Cmd.none)
-        GetResponce result ->
+        GetUsersResponce result ->
           case result of
             Ok val ->
               ({model | users = val}, Cmd.none)
@@ -73,8 +96,27 @@ update msg model =
           (model, Http.post {
             url = "/e/alkersho/account/accounts/",
             body = Http.jsonBody <| Encode.object [("userSearch", Encode.string model.searchUser)],
-            expect = Http.expectJson GetResponce decodeResponce
+            expect = Http.expectJson GetUsersResponce decodeResponce
           })
+        TabMsg tState ->
+          ({model | tab_state = tState}, Cmd.none)
+        DeleteTopic tId ->
+          (model, Http.post {
+            url = "/e/alkersho/forum/"
+            , body = Http.jsonBody <| Encode.object [("post", Encode.int tId)]
+            , expect = Http.expectString PostResponce
+          })
+        NewTopic string ->
+          ({model | new_topic = string}, Cmd.none)
+        AddTopic ->
+          if model.new_topic /= "" then
+            (model, Http.post {
+              url = "/e/alkersho/forum/"
+              , body = Http.jsonBody <| Encode.object [("newTopic", Encode.string model.new_topic)]
+              , expect = Http.expectString PostResponce
+            })
+          else
+            ({model | error = "Topic must not be empty"}, Cmd.none)
 
 setType : String -> String -> Cmd Msg
 setType username newType =
@@ -118,25 +160,51 @@ errorHandler model error =
         Http.BadBody body ->
             { model | error = "bad body " ++ body }
 
+--add topics view
 view : Model -> Html Msg
 view model =
   Grid.container [] [
-    CDN.stylesheet,
-    errorView model,
-    Table.table { options = []
-    , thead = Table.thead [] [
-      Table.tr [] [
-        Table.td [] [text "User Name:"]
-        , Table.td [] [text "User Type:"]
-      ]
-    ]
-    , tbody = Table.tbody [] <|
-      Table.tr [] [
-        Table.td [] [Input.text [Input.value model.searchUser, Input.placeholder "Search...", Input.onInput SearchUser]],
-        Table.td [] [Button.button [Button.primary, Button.onClick SearchButton] [text "Search"]]
-      ]
-       :: users model
-   }
+    Tab.config TabMsg
+    |> Tab.items [
+      Tab.item {
+        id = "accounts"
+        , link = Tab.link [] [text "Accounts"]
+        , pane = Tab.pane [] [
+            errorView model,
+            Table.table { options = []
+            , thead = Table.thead [] [
+              Table.tr [] [
+                Table.td [] [text "User Name:"]
+                , Table.td [] [text "User Type:"]
+              ]
+            ]
+            , tbody = Table.tbody [] <|
+              Table.tr [] [
+                Table.td [] [Input.text [Input.value model.searchUser, Input.placeholder "Search...", Input.onInput SearchUser]],
+                Table.td [] [Button.button [Button.primary, Button.onClick SearchButton] [text "Search"]]
+              ]
+               :: users model
+           }
+        ]
+      }
+      , Tab.item {
+        id = "topics"
+        , link = Tab.link [] [ text "Topics" ]
+        , pane = Tab.pane [] [
+          Table.table {
+            options = []
+            , thead = Table.thead [] []
+            , tbody = Table.tbody [] <|
+              [
+                Table.tr [] [
+                  Table.td [] [Input.text [Input.onInput NewTopic, Input.value model.new_topic, Input.placeholder "New Topic..."]]
+                  , Table.td [] [ Button.button [ Button.primary, Button.onClick AddTopic ] [ text "Add Topic"]]
+                ]
+              ] ++ topics model.topics
+        }
+        ]
+      }
+    ] |> Tab.view model.tab_state
   ]
 
 errorView : Model -> Html Msg
@@ -150,8 +218,7 @@ errorView model =
 userTypes : List (String, String)
 userTypes =
   [
-    ("TCHR", "Teacher"),
-    ("STD", "Student"),
+    ("USR", "User"),
     ("ADM", "Admin")
   ]
 
@@ -181,3 +248,14 @@ users model =
             [] ->
               []
     in row model.users
+
+topics : List Topic -> List (Table.Row Msg)
+topics topicList =
+    case topicList of
+      [] ->
+        []
+      x::xs ->
+        Table.tr [] [
+          Table.td [] [ text x.name ]
+          , Table.td [] [ Button.button [ Button.danger, Button.onClick <| DeleteTopic x.id ] [ text "Delete Topic" ]]
+        ] :: topics xs

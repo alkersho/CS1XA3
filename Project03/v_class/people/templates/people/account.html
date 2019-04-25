@@ -39,8 +39,13 @@
     <script src="{% static "js/admin.js" %}"></script>
     <script type="text/javascript">
       var admin = document.getElementById("admin_page");
+      const flagAdmin = {
+      users : {{ users|safe }},
+      topics : {{ topics|safe }}
+      }
       const adminScript = Elm.AdminAccount.init({
-      node : admin
+      node : admin,
+      flags : flagAdmin
       });
     </script>
   </div>
