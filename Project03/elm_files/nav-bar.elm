@@ -58,8 +58,7 @@ view model =
     |> Nav.fixTop
     |> Nav.brand [] [text "test Brand"]
     |> Nav.items [
-      Nav.itemLink [ href "#" ] [text "Forum"],
-      Nav.itemLink [ href "#" ] [text ""]
+      Nav.itemLink [ href "/e/alkersho/forum/" ] [text "Forum"]
     ]
     |> Nav.customItems [
       Nav.formItem [] <| loginButton model

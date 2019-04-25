@@ -7117,21 +7117,11 @@ var author$project$NavBar$view = function (model) {
 								rundis$elm_bootstrap$Bootstrap$Navbar$itemLink,
 								_List_fromArray(
 									[
-										elm$html$Html$Attributes$href('#')
+										elm$html$Html$Attributes$href('/e/alkersho/forum/')
 									]),
 								_List_fromArray(
 									[
 										elm$html$Html$text('Forum')
-									])),
-								A2(
-								rundis$elm_bootstrap$Bootstrap$Navbar$itemLink,
-								_List_fromArray(
-									[
-										elm$html$Html$Attributes$href('#')
-									]),
-								_List_fromArray(
-									[
-										elm$html$Html$text('')
 									]))
 							]),
 						A3(
