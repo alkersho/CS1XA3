@@ -6189,13 +6189,18 @@ var author$project$Forum$update = F2(
 						A2(author$project$Forum$errorHandler, model, val),
 						elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 'GotoPost':
 				var _int = msg.a;
 				return _Utils_Tuple2(
 					model,
 					elm$browser$Browser$Navigation$load('/e/alkersho/forum/' + (_int + '/')));
+			default:
+				return _Utils_Tuple2(
+					model,
+					elm$browser$Browser$Navigation$load('/e/alkersho/forum/create/'));
 		}
 	});
+var author$project$Forum$CreatePost = {$: 'CreatePost'};
 var author$project$Forum$Search = function (a) {
 	return {$: 'Search', a: a};
 };
@@ -7150,6 +7155,17 @@ var author$project$Forum$view = function (model) {
 							[
 								elm$html$Html$text('Search')
 							]))
+					])),
+				A2(
+				rundis$elm_bootstrap$Bootstrap$Button$button,
+				_List_fromArray(
+					[
+						rundis$elm_bootstrap$Bootstrap$Button$primary,
+						rundis$elm_bootstrap$Bootstrap$Button$onClick(author$project$Forum$CreatePost)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Create a Post')
 					])),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Grid$containerFluid,

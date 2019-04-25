@@ -42,6 +42,7 @@ type Msg =
   | SearchButton
   | SearchResponce (Result Http.Error (List Post))
   | GotoPost String
+  | CreatePost
 
 type alias Flag = {
     posts : List Post
@@ -74,6 +75,8 @@ update msg model =
 
         GotoPost int ->
           (model, Nav.load <| "/e/alkersho/forum/" ++ int ++ "/")
+        CreatePost ->
+          (model, Nav.load "/e/alkersho/forum/create/")
 
 searchEncode : String -> Encode.Value
 searchEncode v =
@@ -92,11 +95,13 @@ decodePostList =
 view : Model -> Html Msg
 view model =
     Grid.container [] <| [
-    Grid.container [] [
-      Input.text [Input.onInput Search, Input.value model.search, Input.placeholder "Search...", Input.attrs [style "width" "80%", style "float" "left"]]
-      , Button.button [Button.primary, Button.onClick SearchButton] [text "Search"]
+      Grid.container [] [
+        Input.text [Input.onInput Search, Input.value model.search, Input.placeholder "Search...", Input.attrs [style "width" "80%", style "float" "left"]]
+        , Button.button [Button.primary, Button.onClick SearchButton] [text "Search"]
+      ]
+      , Button.button [ Button.primary, Button.onClick CreatePost ] [ text "Create a Post"]
+      , Grid.containerFluid [Spacing.mt5] <| postCards model.postList
     ]
-    , Grid.containerFluid [Spacing.mt5] <| postCards model.postList]
 
 postCards : List Post -> List (Html Msg)
 postCards postList =
