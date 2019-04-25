@@ -6197,6 +6197,9 @@ var author$project$CreatePost$update = F2(
 				}
 		}
 	});
+var author$project$CreatePost$Body = function (a) {
+	return {$: 'Body', a: a};
+};
 var author$project$CreatePost$Send = {$: 'Send'};
 var author$project$CreatePost$Title = function (a) {
 	return {$: 'Title', a: a};
@@ -6522,11 +6525,12 @@ var author$project$CreatePost$topicsList = function (list) {
 					rundis$elm_bootstrap$Bootstrap$Form$Select$item,
 					_List_fromArray(
 						[
-							elm$html$Html$Attributes$value(x)
+							elm$html$Html$Attributes$value(
+							elm$core$String$fromInt(x.id))
 						]),
 					_List_fromArray(
 						[
-							elm$html$Html$text(x)
+							elm$html$Html$text(x.name)
 						]))
 				]);
 		} else {
@@ -6538,11 +6542,12 @@ var author$project$CreatePost$topicsList = function (list) {
 					rundis$elm_bootstrap$Bootstrap$Form$Select$item,
 					_List_fromArray(
 						[
-							elm$html$Html$Attributes$value(x)
+							elm$html$Html$Attributes$value(
+							elm$core$String$fromInt(x.id))
 						]),
 					_List_fromArray(
 						[
-							elm$html$Html$text(x)
+							elm$html$Html$text(x.name)
 						])),
 				author$project$CreatePost$topicsList(xs));
 		}
@@ -7121,6 +7126,12 @@ var rundis$elm_bootstrap$Bootstrap$Form$Select$select = F2(
 		return rundis$elm_bootstrap$Bootstrap$Form$Select$view(
 			A2(rundis$elm_bootstrap$Bootstrap$Form$Select$create, options, items));
 	});
+var rundis$elm_bootstrap$Bootstrap$Form$Textarea$OnInput = function (a) {
+	return {$: 'OnInput', a: a};
+};
+var rundis$elm_bootstrap$Bootstrap$Form$Textarea$onInput = function (toMsg) {
+	return rundis$elm_bootstrap$Bootstrap$Form$Textarea$OnInput(toMsg);
+};
 var rundis$elm_bootstrap$Bootstrap$Form$Textarea$Rows = function (a) {
 	return {$: 'Rows', a: a};
 };
@@ -7289,7 +7300,8 @@ var author$project$CreatePost$view = function (model) {
 				rundis$elm_bootstrap$Bootstrap$Form$Textarea$textarea(
 				_List_fromArray(
 					[
-						rundis$elm_bootstrap$Bootstrap$Form$Textarea$rows(5)
+						rundis$elm_bootstrap$Bootstrap$Form$Textarea$rows(5),
+						rundis$elm_bootstrap$Bootstrap$Form$Textarea$onInput(author$project$CreatePost$Body)
 					])),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Button$button,
@@ -7308,6 +7320,7 @@ var elm$browser$Browser$element = _Browser_element;
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var elm$json$Json$Decode$andThen = _Json_andThen;
+var elm$json$Json$Decode$int = _Json_decodeInt;
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$CreatePost$main = elm$browser$Browser$element(
 	{
@@ -7328,4 +7341,16 @@ _Platform_export({'CreatePost':{'init':author$project$CreatePost$main(
 		A2(
 			elm$json$Json$Decode$field,
 			'topics',
-			elm$json$Json$Decode$list(elm$json$Json$Decode$string))))(0)}});}(this));
+			elm$json$Json$Decode$list(
+				A2(
+					elm$json$Json$Decode$andThen,
+					function (name) {
+						return A2(
+							elm$json$Json$Decode$andThen,
+							function (id) {
+								return elm$json$Json$Decode$succeed(
+									{id: id, name: name});
+							},
+							A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int));
+					},
+					A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string))))))(0)}});}(this));

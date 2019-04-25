@@ -28,7 +28,7 @@ type alias Model = {
     title : String
     , body : String
     , topic : String
-    , topics : List String
+    , topics : List TopicRecord
     , error : String
   }
 
@@ -38,8 +38,14 @@ type Msg = Title String
   | Send
   | PostResponce (Result Http.Error String)
 
+type alias TopicRecord =
+  {
+    id : Int
+    , name : String
+  }
+
 type alias Flag = {
-  topics : List String
+  topics : List TopicRecord
   }
 
 init : Flag -> (Model, Cmd Msg)
@@ -114,19 +120,19 @@ view model =
     Form.label [] [text "Title:"],
     Input.text [Input.onInput Title, Input.value model.title, Input.placeholder "Title"],
     Form.label [] [text "Body:"],
-    Textarea.textarea [ Textarea.rows 5 ],
+    Textarea.textarea [ Textarea.rows 5, Textarea.onInput Body ],
     Button.button [Button.primary, Button.onClick Send] [text "Create!"]
   ]
 
-topicsList : List String -> List (Select.Item Msg)
+topicsList : List TopicRecord -> List (Select.Item Msg)
 topicsList list =
     case list of
       [] ->
         [Select.item [] [text "No Topics Available now!"]]
       [x] ->
-        [Select.item [value x] [text x]]
+        [Select.item [value <| String.fromInt x.id ] [text x.name]]
       x::xs ->
-        Select.item [ value x ] [text x] :: topicsList xs
+        Select.item [ value <| String.fromInt x.id ] [text x.name] :: topicsList xs
 
 errorView : Model -> Html Msg
 errorView model =
