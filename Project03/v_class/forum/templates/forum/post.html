@@ -19,4 +19,16 @@
   flags: flag
   });
 </script>
+<div id="comments"></div>
+<script src="{% static "js/comments.js" %}"></script>
+<script type="text/javascript">
+  var commentSection = document.getElementById("comments");
+  const flag = {
+  "comments": {{ comments|safe }},
+  "postID": "{{ post_id }}"
+  };
+  const commentApp = Elm.Comments.init({
+  node: commentSection,
+  flags: flag
+  });
 {% endblock %}

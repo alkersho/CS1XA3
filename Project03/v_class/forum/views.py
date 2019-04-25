@@ -8,6 +8,11 @@ from people.models import Person
 def main(request):
     if request.method == "POST":
         post = json.loads(request.body)
+        if "newTopic" in post.keys():
+            new_topic = post['newTopic']
+            topic = Topic(name=new_topic)
+            topic.save()
+            return HttpResponse("")
         name = post['postName']
         posts = [
             {"title": x.title,
@@ -54,6 +59,15 @@ def create_post(request):
     topics = [x.name for x in Topic.objects.all()]
     return render(request, "forum/create_post.html",
                   context={"topics": topics})
+
+
+def comment(request, post_id_string, parent_id_string):
+    parent_id = int(parent_id_string)
+    post_id = int(post_id_string)
+    if parent_id < 0:
+        return HttpResponse("This is a parent comment")
+    return HttpResponse("parent comment id: {}, post id: {}".format(
+        parent_id, post_id))
 
 
 def edit_posts(request, post_id):

@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Person
+from forum.models import Topic
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 import json
@@ -51,6 +52,15 @@ def main(request):
                    "email": email,
                    "gender": gender,
                    "dob": dob}
+        # admin stuff
+        users = [{"username": x.user.username,
+                  "userType": x.user_type}
+                 for x in Person.objects.all()]
+        topics = [{"name": x.name,
+                   "id": x.pk}
+                  for x in Topic.objects.all()]
+        context['users'] = users
+        context['topics'] = topics
         return render(request, 'people/account.html', context=context)
     return redirect("people:login")
 
@@ -69,8 +79,8 @@ def acount_list(request):
         else:
             p = Person.objects.filter(
                 user__username__startswith=post['username']).first()
-            p.user_type = post['newType']
-            p.save()
+            print(post['newType'])
+            p.set_type(post['newType'])
             return HttpResponse("")
     users_types = [{"username": x.user.username,
                     "userType": x.user_type}
@@ -101,21 +111,22 @@ def logout_page(request):
 def register(request):
     if request.body:
         post = json.loads(request.body)
-        try:
-            user = Person.objects.create_person(password=post['Password'],
-                                                first_name=post['First Name'],
-                                                last_name=post['Last Name'],
-                                                email=post['Email'],
-                                                dob=post['Date of Birth'],
-                                                gender=post['Gender'])
-        except Exception:
-            empty_fields = []
-            values = list(post.values())
-            keys = list(post.keys())
-            for i in range(len(post)):
-                if values[i] == "":
-                    empty_fields.append(keys[i])
+        empty_fields = []
+        values = list(post.values())
+        keys = list(post.keys())
+        for i in range(len(post)):
+            if values[i] == "":
+                empty_fields.append(keys[i])
+                pass
+            pass
+        if len(empty_fields) > 0:
             return HttpResponse("Fields are Empty: " + ', '.join(empty_fields))
+        user = Person.objects.create_person(password=post['Password'],
+                                            first_name=post['First Name'],
+                                            last_name=post['Last Name'],
+                                            email=post['Email'],
+                                            dob=post['Date of Birth'],
+                                            gender=post['Gender'])
         login(request, user.user)
         return HttpResponse("")
     return render(request, "people/register.html")

@@ -20,7 +20,6 @@ class PersonManager(models.Manager):
             except ValueError:
                 number = 1
             username += str(number)
-            print(username)
         user = User.objects.create_user(username=username,
                                         password=password,
                                         email=kwargs['email'])
@@ -57,6 +56,21 @@ class Person(models.Model):
                               null=True)
 
     objects = PersonManager()
+
+    def set_type(self, new_type):
+        if new_type == "ADM":
+            self.user.is_staff = True
+            self.user.is_admin = True
+            self.user.is_superuser = True
+            print(self.user.is_admin)
+            self.user_type = new_type
+        else:
+            self.user.is_staff = False
+            self.user.is_admin = False
+            self.user.is_superuser = False
+            self.user_type = new_type
+        self.user.save()
+        self.save()
 
     def __str__(self):
         return self.user.username

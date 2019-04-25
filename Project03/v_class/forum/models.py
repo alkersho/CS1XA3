@@ -33,7 +33,6 @@ class Comment(models.Model):
     owner = models.ForeignKey(Person, on_delete=models.CASCADE)
     body = models.CharField(max_length=500)
     sub_comment = models.ForeignKey('self', on_delete=models.CASCADE)
-    vote = models.IntegerField()
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     date = models.DateField(auto_now=True)
 
