@@ -120,12 +120,17 @@ def register(request):
             pass
         if len(empty_fields) > 0:
             return HttpResponse("Fields are Empty: " + ', '.join(empty_fields))
-        user = Person.objects.create_person(password=post['Password'],
-                                            first_name=post['First Name'],
-                                            last_name=post['Last Name'],
-                                            email=post['Email'],
-                                            dob=post['Date of Birth'],
-                                            gender=post['Gender'])
+        try:
+            user = Person.objects.create_person(username=post['UserName'],
+                                                password=post['Password'],
+                                                first_name=post['First Name'],
+                                                last_name=post['Last Name'],
+                                                email=post['Email'],
+                                                dob=post['Date of Birth'],
+                                                gender=post['Gender'])
+        except Exception as e:
+            print(e)
+            return HttpResponse("Username Already Taken!")
         login(request, user.user)
         return HttpResponse("")
     return render(request, "people/register.html")

@@ -7,18 +7,8 @@ from django.contrib import admin
 # TODO: only send a message saying the user is already used,
 # do not make a username
 class PersonManager(models.Manager):
-    def create_person(self, first_name, last_name, password, **kwargs):
-        username = last_name + first_name[0]
-        users = Person.objects.filter(
-            user__username__startswith=username).order_by('user__username')
-        likeNames = [x.user.username for x in users.all()]
-        if len(likeNames) > 0:
-            latest = likeNames[-1]
-            try:
-                number = int(latest.split(username)[-1]) + 1
-            except ValueError:
-                number = 1
-            username += str(number)
+    def create_person(self, username, first_name,
+                      last_name, password, **kwargs):
         user = User.objects.create_user(username=username,
                                         password=password,
                                         email=kwargs['email'])

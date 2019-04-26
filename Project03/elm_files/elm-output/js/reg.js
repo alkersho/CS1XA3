@@ -4964,7 +4964,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Register$init = function (_n0) {
 	return _Utils_Tuple2(
-		{dob: '', dobError: _List_Nil, email: '', emailError: _List_Nil, error_response: '', gender: '', genderError: _List_Nil, nameFirst: '', nameLast: '', password: '', passwordAgain: '', passwordAgainError: _List_Nil, passwordError: _List_Nil},
+		{dob: '', dobError: _List_Nil, email: '', emailError: _List_Nil, error_response: '', gender: '', genderError: _List_Nil, nameFirst: '', nameLast: '', password: '', passwordAgain: '', passwordAgainError: _List_Nil, passwordError: _List_Nil, userName: ''},
 		elm$core$Platform$Cmd$none);
 };
 var author$project$Register$dobValidate = function (model) {
@@ -5048,6 +5048,9 @@ var author$project$Register$modelEncode = function (model) {
 	return elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
+				_Utils_Tuple2(
+				'UserName',
+				elm$json$Json$Encode$string(model.userName)),
 				_Utils_Tuple2(
 				'First Name',
 				elm$json$Json$Encode$string(model.nameFirst)),
@@ -6188,6 +6191,13 @@ var elm$browser$Browser$Navigation$load = _Browser_load;
 var author$project$Register$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 'UserName':
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{userName: string}),
+					elm$core$Platform$Cmd$none);
 			case 'FirstName':
 				var string = msg.a;
 				return _Utils_Tuple2(
@@ -6290,6 +6300,9 @@ var author$project$Register$Password = function (a) {
 };
 var author$project$Register$PasswordAgain = function (a) {
 	return {$: 'PasswordAgain', a: a};
+};
+var author$project$Register$UserName = function (a) {
+	return {$: 'UserName', a: a};
 };
 var elm$html$Html$div = _VirtualDom_node('div');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -8291,6 +8304,38 @@ var author$project$Register$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
+						A2(
+						rundis$elm_bootstrap$Bootstrap$Form$row,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								rundis$elm_bootstrap$Bootstrap$Form$colLabel,
+								_List_fromArray(
+									[rundis$elm_bootstrap$Bootstrap$Grid$Col$sm2]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('Username:')
+									])),
+								A2(
+								rundis$elm_bootstrap$Bootstrap$Form$col,
+								_List_fromArray(
+									[rundis$elm_bootstrap$Bootstrap$Grid$Col$sm10]),
+								_List_fromArray(
+									[
+										rundis$elm_bootstrap$Bootstrap$Form$Input$text(
+										_List_fromArray(
+											[
+												rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(
+												_List_fromArray(
+													[
+														A2(elm$html$Html$Attributes$style, 'max-width', '200px'),
+														elm$html$Html$Attributes$required(true)
+													])),
+												rundis$elm_bootstrap$Bootstrap$Form$Input$onInput(author$project$Register$UserName)
+											]))
+									]))
+							])),
 						A2(
 						rundis$elm_bootstrap$Bootstrap$Form$row,
 						_List_Nil,

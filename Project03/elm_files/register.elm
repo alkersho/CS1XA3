@@ -27,6 +27,7 @@ main = Browser.element { init = init,
 
 -- model
 type alias Model = {
+  userName : String,
   nameFirst : String,
   nameLast : String,
   email : String,
@@ -42,7 +43,8 @@ type alias Model = {
   error_response : String
   }
 
-type Msg = FirstName String
+type Msg = UserName String
+         | FirstName String
          | LastName String
          | Gender String
          | Email String
@@ -54,11 +56,26 @@ type Msg = FirstName String
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ( { nameFirst = "", nameLast = "", email = "", emailError = [], dob = "", dobError = [], password = "", passwordError = [], passwordAgain = "", passwordAgainError = [], gender = "", genderError = [], error_response = "" }, Cmd.none )
+    ( { userName = ""
+    , nameFirst = ""
+    , nameLast = ""
+    , email = ""
+    , emailError = []
+    , dob = ""
+    , dobError = []
+    , password = ""
+    , passwordError = []
+    , passwordAgain = ""
+    , passwordAgainError = []
+    , gender = ""
+    , genderError = []
+    , error_response = "" }, Cmd.none )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+      UserName string ->
+        ({model | userName = string}, Cmd.none)
       FirstName string ->
         ({model | nameFirst = string}, Cmd.none)
       LastName string ->
@@ -94,6 +111,12 @@ view model =
     Grid.container [] [
       errorMsg model,
       F.form [] [
+        F.row [] [
+          F.colLabel [ Col.sm2 ] [text "Username:"],
+          F.col [ Col.sm10 ] [
+            Input.text [Input.attrs [style "max-width" "200px", required True], Input.onInput UserName]
+          ]
+        ],
         F.row [] [
           F.colLabel [ Col.sm2 ] [text "First Name:"],
           F.col [ Col.sm10 ] [
@@ -166,6 +189,7 @@ errorMsg model =
 modelEncode : Model -> Encode.Value
 modelEncode model =
     Encode.object [
+        ("UserName", Encode.string model.userName),
         ("First Name", Encode.string model.nameFirst),
         ("Last Name", Encode.string model.nameLast),
         ("Password", Encode.string model.password),
