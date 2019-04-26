@@ -12,6 +12,16 @@ def main(request):
             new_topic = post['newTopic']
             topic = Topic(name=new_topic)
             topic.save()
+            topics = [{"id": x.pk,
+                       "name": x.name}
+                      for x in Topic.objects.all()]
+            return HttpResponse(json.dumps(topics))
+        if "topicID" in post.keys():
+            tID = post['topicID']
+            try:
+                Topic.objects.get(pk=tID).delete()
+            except Exception:
+                return HttpResponse("server Error")
             return HttpResponse("")
         name = post['postName']
         posts = [
@@ -20,7 +30,6 @@ def main(request):
             for x in Post.objects.filter(title__contains=name)
         ]
         return HttpResponse(json.dumps(posts))
-
     posts = [
         {"title": x.title,
          "id": x.id}

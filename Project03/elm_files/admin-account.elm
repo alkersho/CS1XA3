@@ -12,7 +12,8 @@ import Bootstrap.Alert as Alert
 import Bootstrap.Tab as Tab
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Browser as Browser
+import Browser
+import Browser.Navigation as Nav
 import Bootstrap.CDN as CDN
 
 main =
@@ -52,6 +53,7 @@ type Msg =
   | DeleteTopic Int
   | NewTopic String
   | AddTopic
+  | TopicResponce (Result Http.Error (List Topic))
   -- | GetTopicResponce
 
 type alias Flag = {
@@ -79,7 +81,7 @@ update msg model =
             Ok val ->
               case val of
                 "" ->
-                  (model, Cmd.none)
+                  (model, Nav.reload)
                 _ ->
                   ({model | error = val}, Cmd.none)
             Err val ->
@@ -103,7 +105,7 @@ update msg model =
         DeleteTopic tId ->
           (model, Http.post {
             url = "/e/alkersho/forum/"
-            , body = Http.jsonBody <| Encode.object [("post", Encode.int tId)]
+            , body = Http.jsonBody <| Encode.object [("topicID", Encode.int tId)]
             , expect = Http.expectString PostResponce
           })
         NewTopic string ->
@@ -113,10 +115,16 @@ update msg model =
             (model, Http.post {
               url = "/e/alkersho/forum/"
               , body = Http.jsonBody <| Encode.object [("newTopic", Encode.string model.new_topic)]
-              , expect = Http.expectString PostResponce
+              , expect = Http.expectJson TopicResponce decodeTopics
             })
           else
             ({model | error = "Topic must not be empty"}, Cmd.none)
+        TopicResponce result ->
+          case result of
+            Ok val ->
+              ({model | topics = val}, Cmd.none)
+            Err val ->
+              (errorHandler model val, Cmd.none)
 
 setType : String -> String -> Cmd Msg
 setType username newType =
@@ -139,6 +147,14 @@ decodeResponce =
         (Decode.map2 User
             (Decode.field "username" Decode.string)
             (Decode.field "userType" Decode.string)
+        )
+
+decodeTopics : Decode.Decoder (List Topic)
+decodeTopics =
+    Decode.list
+        (Decode.map2 Topic
+            (Decode.field "id" Decode.int)
+            (Decode.field "name" Decode.string)
         )
 
 
@@ -191,7 +207,8 @@ view model =
         id = "topics"
         , link = Tab.link [] [ text "Topics" ]
         , pane = Tab.pane [] [
-          Table.table {
+          errorView model
+          , Table.table {
             options = []
             , thead = Table.thead [] []
             , tbody = Table.tbody [] <|
