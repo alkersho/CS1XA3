@@ -23,18 +23,17 @@ class PersonManager(models.Manager):
                                         password=password,
                                         email=kwargs['email'])
         date = datetime.strptime(kwargs['dob'], '%Y-%m-%d')
-        if 'user_type' in kwargs:
-            person = self.create(user=user,
-                                 first_name=first_name,
-                                 last_name=last_name,
-                                 dob=date,
-                                 gender=kwargs['gender'],
-                                 user_type=kwargs['user_type'])
+        user_c = len(Person.objects.all())
+        admin = False
+        if user_c == 0:
+            admin = True
         person = self.create(user=user,
                              first_name=first_name,
                              last_name=last_name,
                              dob=date,
                              gender=kwargs['gender'])
+        if admin:
+            person.set_type("ADM")
         return person
 
 
