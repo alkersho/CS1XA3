@@ -9,6 +9,7 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Grid as Grid
 import FontAwesome exposing (..)
 import Browser.Navigation as Nav
+import Markdown as Markdown
 import Browser
 
 main : Program Flag Model Msg
@@ -68,7 +69,7 @@ view model =
       ]
       ,Card.config []
       |> Card.block [] [
-        Block.text [] [text model.body]
+        Block.text [] [Markdown.toHtml [] model.body]
       ]
       |> Card.view
     ]
