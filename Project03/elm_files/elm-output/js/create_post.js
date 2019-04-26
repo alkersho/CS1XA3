@@ -4485,7 +4485,33 @@ function _Http_track(router, xhr, tracker)
 			size: event.lengthComputable ? elm$core$Maybe$Just(event.total) : elm$core$Maybe$Nothing
 		}))));
 	});
-}var elm$core$Basics$False = {$: 'False'};
+}var elm$core$Basics$apL = F2(
+	function (f, x) {
+		return f(x);
+	});
+var elm$core$Maybe$Just = function (a) {
+	return {$: 'Just', a: a};
+};
+var elm$core$Maybe$Nothing = {$: 'Nothing'};
+var elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return elm$core$Maybe$Just(x);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var elm$core$Basics$False = {$: 'False'};
 var elm$core$Basics$True = {$: 'True'};
 var elm$core$Result$isOk = function (result) {
 	if (result.$ === 'Ok') {
@@ -4667,10 +4693,6 @@ var elm$core$Array$treeFromBuilder = F2(
 		}
 	});
 var elm$core$Basics$add = _Basics_add;
-var elm$core$Basics$apL = F2(
-	function (f, x) {
-		return f(x);
-	});
 var elm$core$Basics$floor = _Basics_floor;
 var elm$core$Basics$gt = _Utils_gt;
 var elm$core$Basics$max = F2(
@@ -4745,10 +4767,6 @@ var elm$core$Array$initialize = F2(
 			return A5(elm$core$Array$initializeHelp, fn, initialFromIndex, len, _List_Nil, tail);
 		}
 	});
-var elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
-};
-var elm$core$Maybe$Nothing = {$: 'Nothing'};
 var elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -4964,7 +4982,17 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$CreatePost$init = function (flag) {
 	return _Utils_Tuple2(
-		{body: '', error: '', title: '', topic: '', topics: flag.topics},
+		{
+			body: '',
+			error: '',
+			title: '',
+			topic: elm$core$String$fromInt(
+				A2(
+					elm$core$Maybe$withDefault,
+					{id: 0, name: ''},
+					elm$core$List$head(flag.topics)).id),
+			topics: flag.topics
+		},
 		elm$core$Platform$Cmd$none);
 };
 var author$project$CreatePost$PostResponce = function (a) {
@@ -6553,6 +6581,15 @@ var author$project$CreatePost$topicsList = function (list) {
 		}
 	}
 };
+var elm$html$Html$a = _VirtualDom_node('a');
+var elm$html$Html$br = _VirtualDom_node('br');
+var elm$html$Html$p = _VirtualDom_node('p');
+var elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
 var elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -7300,9 +7337,30 @@ var author$project$CreatePost$view = function (model) {
 				rundis$elm_bootstrap$Bootstrap$Form$Textarea$textarea(
 				_List_fromArray(
 					[
-						rundis$elm_bootstrap$Bootstrap$Form$Textarea$rows(5),
+						rundis$elm_bootstrap$Bootstrap$Form$Textarea$rows(20),
 						rundis$elm_bootstrap$Bootstrap$Form$Textarea$onInput(author$project$CreatePost$Body)
 					])),
+				A2(
+				elm$html$Html$p,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('text-muted')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Markdown Enabled')
+					])),
+				A2(
+				elm$html$Html$a,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$href('https://www.markdownguide.org/basic-syntax/')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Basics.')
+					])),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
 				rundis$elm_bootstrap$Bootstrap$Button$button,
 				_List_fromArray(

@@ -14,6 +14,7 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import Browser
 import Browser.Navigation as Nav
+import Maybe as Maybe
 
 main =
   Browser.element
@@ -50,7 +51,11 @@ type alias Flag = {
 
 init : Flag -> (Model, Cmd Msg)
 init flag =
-    ( { title = "", body = "", topic = "", topics = flag.topics, error = "" }, Cmd.none )
+    ( { title = ""
+    , body = ""
+    , topic = String.fromInt (Maybe.withDefault {id=0,name=""} <| List.head flag.topics).id
+    , topics = flag.topics
+    , error = "" }, Cmd.none )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -74,7 +79,7 @@ update msg model =
               Ok val ->
                 case val of
                   "" ->
-                    ({model | error = "Success"}, Nav.load "/e/alkersho/forum/")
+                    ({model | error = ""}, Nav.load "/e/alkersho/forum/")
                   _ ->
                     ({model | error = val}, Cmd.none)
               Err val ->
@@ -120,8 +125,11 @@ view model =
     Form.label [] [text "Title:"],
     Input.text [Input.onInput Title, Input.value model.title, Input.placeholder "Title"],
     Form.label [] [text "Body:"],
-    Textarea.textarea [ Textarea.rows 5, Textarea.onInput Body ],
-    Button.button [Button.primary, Button.onClick Send] [text "Create!"]
+    Textarea.textarea [ Textarea.rows 20, Textarea.onInput Body ],
+    p [class "text-muted"] [ text "Markdown Enabled"],
+    a [ href "https://www.markdownguide.org/basic-syntax/"] [ text "Basics." ]
+    , br [] []
+    , Button.button [Button.primary, Button.onClick Send] [text "Create!"]
   ]
 
 topicsList : List TopicRecord -> List (Select.Item Msg)
