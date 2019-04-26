@@ -47,14 +47,12 @@ def create_post(request):
         post = json.loads(request.body)
         title = post['title']
         body = post['body']
-        print(body)
         topic = Topic.objects.get(pk=int(post['topic']))
         user = Person.objects.get(user=request.user)
         try:
             new_post = Post(title=title, body=body, owner=user, topic=topic)
             new_post.save()
-        except Exception as e:
-            print(e)
+        except Exception:
             return HttpResponse("Failed server error.")
         return HttpResponse("")
     topics = [{"id": x.pk,

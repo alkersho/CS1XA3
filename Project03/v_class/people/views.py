@@ -79,7 +79,6 @@ def acount_list(request):
         else:
             p = Person.objects.filter(
                 user__username__startswith=post['username']).first()
-            print(post['newType'])
             p.set_type(post['newType'])
             return HttpResponse("")
     users_types = [{"username": x.user.username,

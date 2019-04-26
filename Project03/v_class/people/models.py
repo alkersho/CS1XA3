@@ -12,7 +12,6 @@ class PersonManager(models.Manager):
         users = Person.objects.filter(
             user__username__startswith=username).order_by('user__username')
         likeNames = [x.user.username for x in users.all()]
-        print()
         if len(likeNames) > 0:
             latest = likeNames[-1]
             try:
@@ -62,7 +61,6 @@ class Person(models.Model):
             self.user.is_staff = True
             self.user.is_admin = True
             self.user.is_superuser = True
-            print(self.user.is_admin)
             self.user_type = new_type
         else:
             self.user.is_staff = False
