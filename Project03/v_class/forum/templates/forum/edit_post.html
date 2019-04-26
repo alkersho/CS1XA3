@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit{% endblock %}
+
+{% block content %}
+<div id="edit-post"></div>
+<script src="{% static "js/edit_post.js" %}"></script>
+<script>
+  var editDiv = document.getElementById("edit-post");
+  const flag = {
+  "postId": {{ id }},
+  "title": "{{ title }}",
+  "body": `{{ body }}`
+  }
+  const editApp = Elm.EditPost.init({
+  node: editDiv,
+  flags: flag
+  });
+</script>
+{% endblock %}
