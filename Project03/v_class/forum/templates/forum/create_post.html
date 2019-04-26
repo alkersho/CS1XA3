@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Post{% endblock %}
+
+{% block content %}
+<div id="create-post"></div>
+<script src="{% static "js/create_post.js" %}"></script>
+<script type="text/javascript">
+  var create_post = document.getElementById("create-post");
+  const flag = {
+   "topics": {{ topics|safe }}
+  }
+  const createApp = Elm.CreatePost.init({
+  node : create_post,
+  flags : flag
+  });
+</script>
+{% endblock %}

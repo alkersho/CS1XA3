@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Forum{% endblock %}
+
+{% block content %}
+<div id="forum-div"></div>
+<script src="{% static "js/forum.js" %}"></script>
+<script type="text/javascript">
+  var forumDiv = document.getElementById("forum-div");
+  const flag = {
+  "posts": {{ posts|safe }}
+  };
+  const forumApp = Elm.Forum.init({
+  node : forumDiv,
+  flags : flag
+  });
+</script>
+{% endblock %}

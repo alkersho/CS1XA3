@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% if type == "ADM" %}
+<div class="containder-flui">
+  <ul class="nav nav-tabs">
+    <li  class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#account-tab">Account</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#admin-tab">Admin</a>
+    </li>
+  </ul>
+</div>
+<div class="tab-content">
+  <div id="account-tab" class="tab-pane fade-in active">
+    <div id="account"></div>
+    <script src="{% static "js/account.js" %}"></script>
+    <script type="text/javascript">
+      var account = document.getElementById("account");
+      const flag = {
+      fName : "{{ fname }}",
+      lName : "{{ lname }}",
+      userType : "{{ typeDisplay }}",
+      userName : "{{ userName }}",
+      email : "{{ email }}",
+      gender : "{{ gender }}",
+      dob : "{{ dob }}"
+      }
+      const accountElm = Elm.Account.init({
+      node : account,
+      flags : flag
+      });
+    </script>
+  </div>
+  <div id="admin-tab" class="tab-pane">
+    <div id="admin_page"></div>
+    <script src="{% static "js/admin.js" %}"></script>
+    <script type="text/javascript">
+      var admin = document.getElementById("admin_page");
+      const flagAdmin = {
+      users : {{ users|safe }},
+      topics : {{ topics|safe }}
+      }
+      const adminScript = Elm.AdminAccount.init({
+      node : admin,
+      flags : flagAdmin
+      });
+    </script>
+  </div>
+</div>
+{% else %}
+<div id="account"></div>
+<script src="{% static "js/account.js" %}"></script>
+<script type="text/javascript">
+  var account = document.getElementById("account");
+  const flag = {
+    fName : "{{ fname }}",
+    lName : "{{ lname }}",
+    userType : "{{ typeDisplay }}",
+    userName : "{{ userName }}",
+    email : "{{ email }}",
+    gender : "{{ gender }}",
+    dob : "{{ dob }}"
+  }
+  const accountElm = Elm.Account.init({
+  node : account,
+  flags : flag
+  });
+</script>
+{% endif %}
+{% endblock %}

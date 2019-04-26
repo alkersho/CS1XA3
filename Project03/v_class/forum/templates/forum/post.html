@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div id="post"></div>
+<script src="{% static "js/post_view.js" %}"></script>
+<script type="text/javascript">
+  var post = document.getElementById("post");
+  const flag = {
+  "title": "{{ title }}",
+  "body": `{{ body }}`,
+  "id": "{{ post_id }}",
+  "canEdit": {{ canEdit|yesno:"true,false" }},
+  };
+  const postApp = Elm.Post.init({
+  node: post,
+  flags: flag
+  });
+</script>
+<div id="comments"></div>
+<script src="{% static "js/comments.js" %}"></script>
+<script type="text/javascript">
+  var commentSection = document.getElementById("comments");
+  const commentFlag = {
+  "postID": "{{ post_id }}"
+  };
+  const commentApp = Elm.Comments.init({
+  node: commentSection,
+  flags: commentFlag
+  });
+</script>
+{% endblock %}

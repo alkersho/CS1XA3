@@ -4,4 +4,6 @@
 **/.vscode
 **/elm-stuff
 test.html
-**/django_venv
+*venv
+db.sqlite3
+*~
