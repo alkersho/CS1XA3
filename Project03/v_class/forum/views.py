@@ -16,6 +16,8 @@ def main(request):
                        "name": x.name}
                       for x in Topic.objects.all()]
             return HttpResponse(json.dumps(topics))
+        # deleting topics, never actually implemented client side
+        # probably will never implement this feature, as a design choice
         if "topicID" in post.keys():
             tID = post['topicID']
             try:
@@ -23,6 +25,8 @@ def main(request):
             except Exception:
                 return HttpResponse("server Error")
             return HttpResponse("")
+        # searching for posts by title
+        # a more complex algorithm can be employed here, but nah. Maybe later
         name = post['postName']
         posts = [
             {"title": x.title,
@@ -30,6 +34,7 @@ def main(request):
             for x in Post.objects.filter(title__contains=name)
         ]
         return HttpResponse(json.dumps(posts))
+    # loads all topics when loading the forum page
     posts = [
         {"title": x.title,
          "id": x.id}
@@ -37,7 +42,7 @@ def main(request):
     ]
     return render(request, "forum/forum.html", context={"posts": posts})
 
-
+# loads post, might implement delete post here
 def view_post(request, post_id):
     post = Post.objects.get(pk=post_id)
     context = {
@@ -75,6 +80,7 @@ def comment(request, post_id_string, parent_id_string):
     parent_id = int(parent_id_string)
     post_id = int(post_id_string)
     if parent_id < 0:
+        # posting parent comments
         if request.method == "POST":
             if not request.user.is_authenticated:
                 return HttpResponse("You need to be logged in!")
@@ -84,6 +90,7 @@ def comment(request, post_id_string, parent_id_string):
                         post=Post.objects.get(pk=post_id))
             c.save()
             return HttpResponse("")
+        # getting all comments
         if request.method == "GET":
             comments = [{"postID": post_id,
                          "commentID": x.pk,
@@ -93,6 +100,7 @@ def comment(request, post_id_string, parent_id_string):
                                 post__pk=post_id).filter(parent_comment=None)]
             return HttpResponse(json.dumps(comments))
         return HttpResponse("This is a parent comment")
+    # posting sub comments
     if request.method == "POST":
         if request.user.is_authenticated:
             post = json.loads(request.body)
@@ -104,6 +112,7 @@ def comment(request, post_id_string, parent_id_string):
             return HttpResponse("")
         else:
             return HttpResponse("You need to be logged in!")
+    # for testing purposes, users should never access this site
     return HttpResponse("parent comment id: {}, post id: {}".format(
         parent_id, post_id))
 

@@ -4,8 +4,8 @@ from datetime import datetime
 from django.contrib import admin
 
 
-# TODO: only send a message saying the user is already used,
-# do not make a username
+# manager for person model
+# needed for special admin creation
 class PersonManager(models.Manager):
     def create_person(self, username, first_name,
                       last_name, password, **kwargs):
@@ -15,6 +15,7 @@ class PersonManager(models.Manager):
         date = datetime.strptime(kwargs['dob'], '%Y-%m-%d')
         user_c = len(Person.objects.all())
         admin = False
+        # if it is the user to be created it is made admin
         if user_c == 0:
             admin = True
         person = self.create(user=user,
@@ -45,6 +46,8 @@ class Person(models.Model):
 
     objects = PersonManager()
 
+    # if the new type is given admin privileges
+    # other they are stripped of them
     def set_type(self, new_type):
         if new_type == "ADM":
             self.user.is_staff = True
@@ -62,6 +65,7 @@ class Person(models.Model):
     def __str__(self):
         return self.user.username
 
+    # permissions were abanoned, they serve nothin now, maybe implement later?
     class Meta:
         permissions = (('can_change_person_type', 'Change Account Type'),
                        ('can_change_name', 'Change User Name'))

@@ -8,11 +8,16 @@ import json
 
 
 def main(request):
+    """ accounts page, handles requests based on the accounts page """
+    # if user is authenticated they are allowed in, otherwise they are
+    # redirected to the login page
     if request.user.is_authenticated:
+        # if it is a post request, this method of checking works but
         if request.body:
             post = json.loads(request.body)
             email = post.get("email", "")
             newPass = post.get("newPass", "")
+            # checks that the values for password and email are not empty
             if email == "":
                 if newPass == "":
                     return HttpResponse("Please Enter a Password!")
@@ -32,8 +37,8 @@ def main(request):
                 request.user.email = email
                 request.user.save()
                 return HttpResponse("")
-
             return HttpResponse("")
+        # gathers data to be sent to elm using the flag
         username = request.user.username
         user = Person.objects.filter(
             user__username__startswith=username).first()
@@ -64,7 +69,7 @@ def main(request):
         return render(request, 'people/account.html', context=context)
     return redirect("people:login")
 
-
+# handles searching for accounts in admin page
 def acount_list(request):
     if request.body:
         post = json.loads(request.body)
@@ -87,7 +92,7 @@ def acount_list(request):
     responce = json.dumps({"responce": users_types})
     return HttpResponse(responce)
 
-
+# login page
 def login_page(request):
     if request.body:
         post = json.loads(request.body)

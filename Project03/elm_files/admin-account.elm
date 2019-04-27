@@ -1,20 +1,20 @@
 module AdminAccount exposing (main)
 
-import Http
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Bootstrap.Form.Select as Select
-import Bootstrap.Button as Button
-import Bootstrap.Form.Input as Input
-import Bootstrap.Table as Table
-import Bootstrap.Grid as Grid
 import Bootstrap.Alert as Alert
+import Bootstrap.Button as Button
+import Bootstrap.CDN as CDN
+import Bootstrap.Form.Select as Select
+import Bootstrap.Form.Input as Input
+import Bootstrap.Grid as Grid
 import Bootstrap.Tab as Tab
-import Json.Decode as Decode
-import Json.Encode as Encode
+import Bootstrap.Table as Table
 import Browser
 import Browser.Navigation as Nav
-import Bootstrap.CDN as CDN
+import Http
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (value, selected)
+import Json.Decode as Decode
+import Json.Encode as Encode
 
 main =
   Browser.element {
@@ -176,13 +176,12 @@ errorHandler model error =
         Http.BadBody body ->
             { model | error = "bad body " ++ body }
 
---add topics view
 view : Model -> Html Msg
 view model =
   Grid.container [] [
     Tab.config TabMsg
     |> Tab.items [
-      Tab.item {
+      Tab.item { -- accounts view, where user can view and edit accounts
         id = "accounts"
         , link = Tab.link [] [text "Accounts"]
         , pane = Tab.pane [] [
@@ -203,7 +202,7 @@ view model =
            }
         ]
       }
-      , Tab.item {
+      , Tab.item { -- topics view, where user can edit, delete and add topics
         id = "topics"
         , link = Tab.link [] [ text "Topics" ]
         , pane = Tab.pane [] [

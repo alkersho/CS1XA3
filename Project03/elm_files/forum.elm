@@ -1,21 +1,21 @@
 module Forum exposing (main)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
-import Http
-import Bootstrap.Grid as Grid
-import Bootstrap.ListGroup as ListGroup
-import Bootstrap.Form.Input as Input
+import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
-import Bootstrap.Alert as Alert
+import Bootstrap.Form.Input as Input
+import Bootstrap.Grid as Grid
+import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Utilities.Spacing as Spacing
-import Json.Decode as Decode
-import Json.Encode as Encode
 import Browser
 import Browser.Navigation as Nav
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
+import Http
+import Json.Decode as Decode
+import Json.Encode as Encode
 
 main : Program Flag Model Msg
 main =

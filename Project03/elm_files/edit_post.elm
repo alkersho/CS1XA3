@@ -1,17 +1,17 @@
 module EditPost exposing (main)
 
-import Http
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.Textarea as Textarea
 import Bootstrap.Button as Button
 import Bootstrap.Alert as Alert
 import Bootstrap.Grid as Grid
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
-import Json.Encode as Encode
 import Browser
 import Browser.Navigation as Nav
+import Http
+import Html exposing (Html, div, text, br, a, p)
+import Html.Attributes exposing (href, class)
+import Html.Events exposing (onClick)
+import Json.Encode as Encode
 
 main : Program Flag Model Msg
 main =
@@ -40,6 +40,7 @@ type Msg =
   Body String
   | Submit
   | PostResponce (Result Http.Error String)
+
 init : Flag -> (Model, Cmd Msg)
 init flag =
     ( { postId = flag.postId

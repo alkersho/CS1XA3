@@ -7,13 +7,13 @@ import Bootstrap.Form.Select as Select
 import Bootstrap.Button as Button
 import Bootstrap.Grid as Grid
 import Bootstrap.Alert as Alert
-import Http
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Json.Encode as Encode
-import Json.Decode as Decode
 import Browser
 import Browser.Navigation as Nav
+import Http
+import Html exposing (Html, div, text, br, a, p)
+import Html.Attributes exposing (value, href, class)
+import Json.Encode as Encode
+import Json.Decode as Decode
 import Maybe as Maybe
 
 main =

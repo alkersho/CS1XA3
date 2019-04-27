@@ -1,19 +1,19 @@
 module Account exposing (main)
 
 import Browser as Browser
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
-import Http
-import Json.Encode as Encode
-import Json.Decode as Decode
-import Bootstrap.Grid as Grid
-import Bootstrap.Table as Table
+import Bootstrap.Button as Button
 import Bootstrap.Form.Input as Input
+import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as Lists
 import Bootstrap.Utilities.Spacing as Spacing
-import Bootstrap.Button as Button
+import Bootstrap.Table as Table
 import FontAwesome exposing (..)
+import Html exposing (Html, text)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
+import Http
+import Json.Decode as Decode
+import Json.Encode as Encode
 
 main =
   Browser.element {
@@ -23,7 +23,7 @@ main =
     , subscriptions = \_ -> Sub.none
   }
 
--- will contain account details
+-- model
 type alias Model = {
     fName : String,
     lName : String,
@@ -40,6 +40,7 @@ type alias Model = {
     error : String
   }
 
+-- msg
 type Msg = Email String
          | EditEmail Bool
          | Password String
@@ -48,6 +49,7 @@ type Msg = Email String
          | EmailResponce (Result Http.Error String)
          | PassResponce (Result Http.Error String)
 
+-- flag
 type alias Flag = {
     fName : String,
     lName : String,
@@ -58,6 +60,7 @@ type alias Flag = {
     dob : String
   }
 
+
 type alias Responce = {
   email : String,
   password : String
@@ -65,7 +68,7 @@ type alias Responce = {
 
 init : Flag -> (Model, Cmd Msg)
 init flag =
-  (Model
+  (Model     -- side comment, I prefer init this way, without the curly brackets
     flag.fName
     flag.lName
     flag.userType
@@ -167,7 +170,6 @@ view model =
         ]
       ] ++ changePass model ++ [errorMsg model] }
     ]
-
 
 errorMsg : Model -> Table.Row Msg
 errorMsg model =
